@@ -1,0 +1,731 @@
+<form [formGroup]="incidentForm" (ngSubmit)="onSubmit()">
+
+<div *ngIf="errorMessage" class="alert alert-danger mb-3">
+  {{ errorMessage }}
+</div>
+<div *ngIf="successMessage" class="alert alert-success mb-3">
+  {{ successMessage }}
+</div>
+
+<div class="container mt-4" [formGroup]="incidentForm" (ngSubmit)="onSubmit()">
+  <h1 class="text-center mb-4 fw-bold">Fiche à transmettre au Coordonnateur Gestion des Risques</h1>
+
+  <!-- Section Date de réception -->
+  <div class="card mb-4 border-primary">
+    <div class="card-header bg-light">
+      <h4 class="fw-bold mb-0">Date de réception</h4>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="dateReception" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold">N° d'enregistrement</label>
+          <input type="text" class="form-control" formControlName="numeroEnregistrement">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+        <div class="col-md-3">
+          <!-- <label class="form-label fw-bold">Champ obligatoire <span class="text-danger">*</span></label> -->
+          <!-- <input type="password" class="form-control" formControlName="password" required> -->
+        </div>
+      </div>
+
+ <!-- Section Événement -->
+<div class="card mb-4 border-primary" formGroupName="evenement">
+  <div class="card-header bg-light">
+    <h4 class="fw-bold mb-0">Événement <span class="text-danger">*</span></h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <!-- Champ Date -->
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+        <input type="date" 
+               class="form-control" 
+               formControlName="dateEvenement" 
+               [class.is-invalid]="evenementGroup.get('dateEvenement')?.invalid && evenementGroup.get('dateEvenement')?.touched"
+               required>
+        <div *ngIf="evenementGroup.get('dateEvenement')?.invalid && evenementGroup.get('dateEvenement')?.touched" 
+             class="invalid-feedback">
+          La date est obligatoire
+        </div>
+      </div>
+      
+      <!-- Champ Heure -->
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Heure <span class="text-danger">*</span></label>
+        <input type="time" 
+               class="form-control" 
+               formControlName="heureEvenement" 
+               [class.is-invalid]="evenementGroup.get('heureEvenement')?.invalid && evenementGroup.get('heureEvenement')?.touched"
+               required>
+        <div *ngIf="evenementGroup.get('heureEvenement')?.invalid && evenementGroup.get('heureEvenement')?.touched" 
+             class="invalid-feedback">
+          L'heure est obligatoire
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section Concernés -->
+<div class="card mb-4 border-primary">
+  <div class="card-header bg-light">
+    <h4 class="fw-bold mb-0">Personnes/Éléments concernés</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="concernePatient" id="concernePatient">
+          <label class="form-check-label" for="concernePatient">Patient</label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="concernePersonnel" id="concernePersonnel">
+          <label class="form-check-label" for="concernePersonnel">Personnel</label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="concerneVisiteur" id="concerneVisiteur">
+          <label class="form-check-label" for="concerneVisiteur">Visiteur</label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="concerneFournisseur" id="concerneFournisseur">
+          <label class="form-check-label" for="concerneFournisseur">Fournisseur</label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="concerneMateriel" id="concerneMateriel">
+          <label class="form-check-label" for="concerneMateriel">Matériel</label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="concerneOrganisation" id="concerneOrganisation">
+          <label class="form-check-label" for="concerneOrganisation">Organisation</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Section Nature de l'événement - Accueil -->
+  <div class="card mb-4 border-primary">
+    <div class="card-header bg-light">
+      <h4 class="fw-bold mb-0">Nature de l'événement <span class="text-danger">*</span></h4>
+    </div>
+    <div class="card-body">
+      <h5 class="fw-bold">Accueil</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="natureAccueilManqueInfo"> Manque d'information</td>
+            <td><input type="checkbox" formControlName="natureAccueilCommViolente"> Communication violente</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="natureAccueilComportement"> Comportement inadéquat</td>
+            <td><input type="checkbox" formControlName="natureAccueilAbsenceEcoute"> Absence d'écoute active</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="natureAccueilErreurOrientation"> Erreur d'orientation</td>
+            <td><input type="checkbox" formControlName="natureAccueilAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="natureAccueilAutrePrecision" 
+                     [class.is-disabled]="!incidentForm.get('natureAccueilAutre')?.value"
+                     [readonly]="!incidentForm.get('natureAccueilAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h5 class="fw-bold mt-4">Prestations de soins/PEC</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="natureSoinsRetardPEC"> Retard de prise en charge</td>
+            <td><input type="checkbox" formControlName="natureSoinsComplication"> Complication liée aux soins</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="natureSoinsErreurMedicamenteuse"> Erreur médicamenteuse</td>
+            <td><input type="checkbox" formControlName="natureSoinsRetardTraitement"> Retard du traitement</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="natureSoinsInfection"> Infection associée aux soins</td>
+            <td><input type="checkbox" formControlName="natureSoinsChutePatient"> Chute du patient</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="natureSoinsFugue"> Fugue</td>
+            <td><input type="checkbox" formControlName="natureSoinsEscarre"> Apparition d'escarre</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="natureSoinsDefautTransmission"> Défaut de transmission ciblée</td>
+            <td><input type="checkbox" formControlName="natureSoinsAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="natureSoinsAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('natureSoinsAutre')?.value"
+                     [readonly]="!incidentForm.get('natureSoinsAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Droit du patient -->
+      <h5 class="fw-bold mt-4">Droit du patient</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="droitDignite"> Non-respect de la dignité</td>
+            <td><input type="checkbox" formControlName="droitReligion"> Non-respect des convictions religieuses</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="droitInfoAbsente"> Absence d'information</td>
+            <td><input type="checkbox" formControlName="droitAccesDossier"> Accès au dossier non autorisé</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="droitChoixMedecin"> Choix du médecin non permis</td>
+            <td><input type="checkbox" formControlName="droitConfidentialite"> Non-respect de la Confidentialité</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="droitConsentement"> Non-respect du Consentement</td>
+            <td><input type="checkbox" formControlName="droitAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="droitAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('droitAutre')?.value"
+                     [readonly]="!incidentForm.get('droitAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Dossier patient -->
+      <h5 class="fw-bold mt-4">Dossier patient</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="dossierPerte"> Perte du dossier médical</td>
+            <td><input type="checkbox" formControlName="dossierIncomplet"> Dossier incomplet</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="dossierInfoManquante"> Informations manquantes</td>
+            <td><input type="checkbox" formControlName="dossierAccesNonAutorise"> Accès non autorisé au dossier</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="dossierMalRedige"> Dossier mal rédigé/mal structuré</td>
+            <td><input type="checkbox" formControlName="dossierAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="dossierAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('dossierAutre')?.value"
+                     [readonly]="!incidentForm.get('dossierAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Transport sanitaire -->
+      <h5 class="fw-bold mt-4">Transport sanitaire</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="transportAbsence"> Absence ambulance</td>
+            <td><input type="checkbox" formControlName="transportRetard"> Retard ambulance</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="transportDefectueux"> Véhicule défectueux</td>
+            <td><input type="checkbox" formControlName="transportPanne"> Panne en route</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="transportNonEquipe"> Ambulance non équipée</td>
+            <td><input type="checkbox" formControlName="transportCollision"> Collision/choc</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="transportAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="transportAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('transportAutre')?.value"
+                     [readonly]="!incidentForm.get('transportAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Risque professionnel -->
+      <h5 class="fw-bold mt-4">Risque professionnel</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="risqueAES"> Accident d'Exposition au Sang</td>
+            <td><input type="checkbox" formControlName="risqueInfection"> Infection liée aux soins</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="risqueMaladiePro"> Maladie professionnelle</td>
+            <td><input type="checkbox" formControlName="risqueChute"> Chute/heurt</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="risqueTMS"> Trouble musculo-squelettique</td>
+            <td><input type="checkbox" formControlName="risqueChimique"> Risque chimique toxique</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="risqueRadioactif"> Risque radioactif</td>
+            <td><input type="checkbox" formControlName="risquePsycho"> Risque psycho-social (Anxiété/dépression)</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="risqueBlessure"> Blessure/coupure/brûlure</td>
+            <td><input type="checkbox" formControlName="risqueHarcelement"> Harcèlement</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="risqueAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="risqueAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('risqueAutre')?.value"
+                     [readonly]="!incidentForm.get('risqueAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Identité du patient -->
+      <h5 class="fw-bold mt-4">Identité du patient</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="identiteConfusion"> Confusion lors d'intervention médicale</td>
+            <td><input type="checkbox" formControlName="identiteEchange"> Echange d'informations erronées</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="identiteDoublon"> Doublons de dossier</td>
+            <td><input type="checkbox" formControlName="identiteAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="identiteAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('identiteAutre')?.value"
+                     [readonly]="!incidentForm.get('identiteAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Prestations hôtelières -->
+      <h5 class="fw-bold mt-4">Prestations hôtelières</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="hotelChambreSale"> Chambre sale</td>
+            <td><input type="checkbox" formControlName="hotelLingeSale"> Linge sale</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="hotelPoubelle"> Poubelle non vidée</td>
+            <td><input type="checkbox" formControlName="hotelLit"> Lit endommagé</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="hotelDouche"> Douche/WC en panne</td>
+            <td><input type="checkbox" formControlName="hotelAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="hotelAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('hotelAutre')?.value"
+                     [readonly]="!incidentForm.get('hotelAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Organisation/Logistique -->
+      <h5 class="fw-bold mt-4">Organisation/Logistique</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="orgRuptureStock"> Rupture de stock</td>
+            <td><input type="checkbox" formControlName="orgDefaillanceInfo"> Défaillance informatique</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="orgInterruptionAppro"> Interruption de la chaîne d'approvisionnement</td>
+            <td><input type="checkbox" formControlName="orgErreurCommande"> Erreur de commande</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="orgGestionStock"> Erreur de gestion des stocks</td>
+            <td><input type="checkbox" formControlName="orgRetardLivraison"> Retard de livraison</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="orgAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="orgAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('orgAutre')?.value"
+                     [readonly]="!incidentForm.get('orgAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Sécurité des personnes -->
+      <h5 class="fw-bold mt-4">Sécurité des personnes</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="secuIncendie"> Incendie</td>
+            <td><input type="checkbox" formControlName="secuInondation"> Inondation</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="secuExplosion"> Explosion</td>
+            <td><input type="checkbox" formControlName="secuEffondrement"> Effondrement d'objets</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="secuAgression"> Agression/violence</td>
+            <td><input type="checkbox" formControlName="secuChantier"> Chantier sans balisage</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="secuAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="secuAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('secuAutre')?.value"
+                     [readonly]="!incidentForm.get('secuAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Bien du patient -->
+      <h5 class="fw-bold mt-4">Bien du patient</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="bienPerte"> Perte d'effets personnels</td>
+            <td><input type="checkbox" formControlName="bienDeterioration"> Détérioration des biens du patient</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="bienConfusion"> Confusion entre les effets des patients</td>
+            <td><input type="checkbox" formControlName="bienVol"> Vol des objets de valeur</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="bienAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="bienAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('bienAutre')?.value"
+                     [readonly]="!incidentForm.get('bienAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Restauration -->
+      <h5 class="fw-bold mt-4">Restauration</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="restoIntoxication"> Intoxication alimentaire</td>
+            <td><input type="checkbox" formControlName="restoAvarie"> Repas avarié</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="restoDegoutant"> Repas dégoûtant</td>
+            <td><input type="checkbox" formControlName="restoRegime"> Non-respect du régime prescrit</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="restoRetard"> Retard de livraison des repas</td>
+            <td><input type="checkbox" formControlName="restoVaisselle"> Vaisselle non propre</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="restoAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="restoAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('restoAutre')?.value"
+                     [readonly]="!incidentForm.get('restoAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Prestations techniques -->
+      <h5 class="fw-bold mt-4">Prestations techniques</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="techElectricite"> Problème électricité</td>
+            <td><input type="checkbox" formControlName="techPlomberie"> Problème plomberie</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="techClimatisation"> Problème climatisation</td>
+            <td><input type="checkbox" formControlName="techFluides"> Problème fluides médicaux</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="techAscenseur"> Panne ascenseur</td>
+            <td><input type="checkbox" formControlName="techEquipement"> Dysfonctionnement équipement médical</td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" formControlName="techAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="techAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('techAutre')?.value"
+                     [readonly]="!incidentForm.get('techAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section Environnement -->
+      <h5 class="fw-bold mt-4">Environnement</h5>
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" formControlName="envPollution"> Pollution importante des surfaces</td>
+            <td><input type="checkbox" formControlName="envDechets"> Déchets non éliminés</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="envEau"> Contamination de l'eau</td>
+            <td><input type="checkbox" formControlName="envAir"> Contamination de l'air</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="envOdeur"> Odeur insupportable</td>
+            <td><input type="checkbox" formControlName="envAnimaux"> Prolifération d'animaux</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" formControlName="envInsectes"> Pullulation d'insectes</td>
+            <td><input type="checkbox" formControlName="envAutre"> Autre : 
+              <input type="text" class="form-control-sm" formControlName="envAutrePrecision"
+                     [class.is-disabled]="!incidentForm.get('envAutre')?.value"
+                     [readonly]="!incidentForm.get('envAutre')?.value">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section Description brève des faits -->
+  <div class="card mb-4 border-primary">
+    <div class="card-header bg-light">
+      <h4 class="fw-bold mb-0">Description brève des faits (Quoi ? Où ? Quand ? Comment ?) <span class="text-danger">*</span></h4>
+    </div>
+    <div class="card-body">
+      <textarea class="form-control" rows="4" formControlName="descriptionFaits" required></textarea>
+    </div>
+  </div>
+
+<!-- Section Mesures prises immédiatement -->
+<!-- Section Mesures prises immédiatement -->
+<div class="card mb-4 border-primary">
+  <div class="card-header bg-light">
+    <h4 class="fw-bold mb-0">Mesures prises immédiatement <span class="text-danger">*</span></h4>
+  </div>
+  <div class="card-body">
+    <textarea 
+      class="form-control" 
+      rows="4" 
+      formControlName="mesuresImmediates" 
+      [class.is-invalid]="incidentForm.get('mesuresImmediates')?.invalid && incidentForm.get('mesuresImmediates')?.touched"
+      required>
+    </textarea>
+    <div *ngIf="incidentForm.get('mesuresImmediates')?.invalid && incidentForm.get('mesuresImmediates')?.touched" 
+         class="invalid-feedback d-block">
+      Les mesures immédiates sont obligatoires
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- Section Partie réservée au Coordonnateur Gestion des Risques -->
+  <!-- Section Partie réservée au Coordonnateur Gestion des Risques -->
+<div class="card mb-4 border-primary">
+  <div class="card-header bg-light">
+    <h4 class="fw-bold mb-0">Partie réservée au Coordonnateur Gestion des Risques</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="fw-bold">Causes immédiates</h5>
+        <textarea class="form-control" rows="3" formControlName="causesImmediates"></textarea>
+      </div>
+      <div class="col-md-6">
+        <h5 class="fw-bold">Causes profondes</h5>
+        <textarea class="form-control" rows="3" formControlName="causesProfondes"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Section Gravité estimée -->
+  <div class="card mb-4 border-primary">
+    <div class="card-header bg-light">
+      <h4 class="fw-bold mb-0">Gravité estimée <span class="text-danger">*</span></h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>1 Bénin</th>
+            <th>2 Peu grave</th>
+            <th>3 Moyenne</th>
+            <th>4 Grave</th>
+            <th>5 Très grave</th>
+            <th>6 Catastrophique</th>
+            <th>Cet évènement est-il évitable ? <span class="text-danger">*</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+         <td><input type="radio" name="gravite" formControlName="gravite" [value]="1" required></td>
+<td><input type="radio" name="gravite" formControlName="gravite" [value]="2"></td>
+<td><input type="radio" name="gravite" formControlName="gravite" [value]="3"></td>
+<td><input type="radio" name="gravite" formControlName="gravite" [value]="4"></td>
+<td><input type="radio" name="gravite" formControlName="gravite" [value]="5"></td>
+<td><input type="radio" name="gravite" formControlName="gravite" [value]="6"></td>
+
+
+          <div class="form-group">
+  <label for="evitable">Évitable</label>
+  <select id="evitable" formControlName="evitable" class="form-control" required>
+    <option [ngValue]="true">Oui</option>
+    <option [ngValue]="false">Non</option>
+  </select>
+</div>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<!-- Section Actions correctives/préventives proposées -->
+<div class="card mb-4 border-primary">
+  <div class="card-header bg-light">
+    <h4 class="fw-bold mb-0">Actions correctives/préventives proposées</h4>
+  </div>
+  <div class="card-body">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Responsable</th>
+          <th>Échéance</th>
+          <th>Terminée</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="actionsCorrectives">
+        <ng-container *ngFor="let action of actionsCorrectives.controls; let i = index">
+          <tr [formGroupName]="i">
+            <td><input type="text" class="form-control" formControlName="description" required></td>
+            <td><input type="text" class="form-control" formControlName="responsableNom" placeholder="Nom du responsable" required></td>
+            <td><input type="date" class="form-control" formControlName="dateEcheance" required></td>
+            <td class="text-center">
+              <input type="checkbox" formControlName="estTerminee">
+            </td>
+            <td><button type="button" class="btn btn-danger btn-sm" (click)="removeActionCorrective(i)">Supprimer</button></td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <button type="button" (click)="addActionCorrective()" 
+            [disabled]="!currentUser?.role || currentUser.role !== 'ADMIN'" 
+            class="btn btn-primary mt-2">
+      Ajouter une action corrective
+    </button>
+  </div>
+</div>
+
+<!-- Section Evaluation des actions mises en place -->
+<div class="card mb-4 border-primary">
+  <div class="card-header bg-light">
+    <h4 class="fw-bold mb-0">Evaluation des actions mises en place</h4>
+  </div>
+  <div class="card-body">
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="efficace" formControlName="evaluationEfficace">
+      <label class="form-check-label" for="efficace">Efficace</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="inefficace" formControlName="evaluationInefficace">
+      <label class="form-check-label" for="inefficace">Inefficace</label>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Date</label>
+        <input type="date" class="form-control" formControlName="evaluationDate">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-bold">Responsable</label>
+        <!-- ✅ corrige ici -->
+        <input type="text" class="form-control" formControlName="evaluationResponsable">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Section Date de clôture -->
+  <div class="card mb-4 border-primary">
+    <div class="card-header bg-light">
+      <h4 class="fw-bold mb-0">Date de clôture</h4>
+    </div>
+    <div class="card-body">
+      <input type="date" class="form-control" formControlName="dateCloture">
+    </div>
+  </div>
+
+  <!-- Section Observations -->
+  <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+    <button type="button" 
+            class="btn btn-secondary px-4"
+            (click)="navigateToList()">
+      Annuler
+    </button>
+    
+    <button type="submit"
+            class="btn btn-primary px-4"
+            [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    <strong>Erreur :</strong> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success mt-3">
+    {{ successMessage }}
+  </div>
+
+ <form [formGroup]="incidentForm" (ngSubmit)="onSubmit()" class="incident-form">
+  <!-- Tes champs de formulaire ici -->
+
+  <!-- Bouton -->
+
+
+  <!-- Spinner centré -->
+  <div class="spinner-overlay" *ngIf="isSubmitting">
+    <div class="spinner"></div>
+  </div>
+</form>
+
+<!-- Indicateur de statut -->
+<div class="card mb-4 border-primary">
+  <div class="card-header bg-light d-flex justify-content-between align-items-center">
+    <h4 class="fw-bold mb-0">Statut de la déclaration</h4>
+    <span class="badge" [ngClass]="{
+      'bg-secondary': incidentForm.value.statut === 0,
+      'bg-primary': incidentForm.value.statut === 1,
+      'bg-info': incidentForm.value.statut === 2,
+      'bg-warning': incidentForm.value.statut === 3,
+      'bg-success': incidentForm.value.statut === 4,
+      'bg-dark': incidentForm.value.statut === 5
+    }">
+      {{ getStatutLabel(incidentForm.value.statut) }}
+    </span>
+  </div>
+  <div class="card-body">
+    <div class="progress mb-2" style="height: 20px;">
+      <div class="progress-bar" role="progressbar" 
+           [ngStyle]="{'width': (incidentForm.value.statut/5*100) + '%'}" 
+           [ngClass]="{
+             'bg-secondary': incidentForm.value.statut === 0,
+             'bg-primary': incidentForm.value.statut === 1,
+             'bg-info': incidentForm.value.statut === 2,
+             'bg-warning': incidentForm.value.statut === 3,
+             'bg-success': incidentForm.value.statut === 4,
+             'bg-dark': incidentForm.value.statut === 5
+           }">
+      </div>
+    </div>
+    <small class="text-muted">
+      Workflow: Brouillon → Soumis → En cours d'analyse → Action requise → Résolu → Clôturé
+    </small>
+  </div>
+</div>

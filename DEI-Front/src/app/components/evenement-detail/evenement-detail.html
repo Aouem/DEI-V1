@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détails de l'Incident | Gestion des Événements</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --success: #4cc9f0;
+      --warning: #f72585;
+      --info: #7209b7;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gradient-primary: linear-gradient(135deg, #4361ee, #3a0ca3);
+      --gradient-success: linear-gradient(135deg, #4cc9f0, #4895ef);
+      --gradient-warning: linear-gradient(135deg, #e472a5, #b5179e);
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #334155;
+      padding: 20px;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 25px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Header stylisé */
+    .event-header {
+      background: var(--gradient-primary);
+      color: rgb(231, 100, 100);
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-header::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(25deg);
+    }
+
+    .event-title {
+      font-weight: 800;
+      font-size: 2.2rem;
+      margin-bottom: 0;
+      position: relative;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Cartes modernes */
+    .event-card {
+      border: none;
+      border-radius: 18px;
+      overflow: hidden;
+      transition: var(--transition);
+      margin-bottom: 30px;
+      font-size: 1.05rem;
+    }
+
+    .event-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-shadow);
+    }
+
+    .card-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 700;
+      padding: 20px 30px;
+      font-size: 1.2rem;
+      background: linear-gradient(to right, #659dd6, #e9ecef) !important;
+    }
+
+    .card-body {
+      padding: 30px;
+    }
+
+    /* Badges modernes */
+    .badge {
+      padding: 10px 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .type-badge {
+      background: var(--gradient-success);
+      color: rgb(37, 2, 2);
+    }
+
+    .gravite-badge {
+      background: var(--gradient-warning);
+      color: rgb(65, 5, 5);
+      font-size: 1.1rem;
+      padding: 12px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(247, 37, 133, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-badge {
+      background: var(--gradient-primary);
+      color: rgb(41, 9, 9);
+    }
+
+    .boolean-badge {
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .boolean-badge.true {
+      background: rgba(76, 201, 240, 0.2);
+      color: #4cc9f0;
+      border: 1px solid #4cc9f0;
+    }
+
+    .boolean-badge.false {
+      background: rgba(247, 37, 133, 0.2);
+      color: #f72585;
+      border: 1px solid #f72585;
+    }
+
+    /* Compteur de gravité */
+    .gravite-counter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      color: #f72585;
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-right: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Style spécial pour le nom admin */
+    .admin-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #c6bbe2, #8ca1fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      padding: 5px 0;
+    }
+
+    /* Boutons créatifs */
+    .fancy-btn {
+      background: rgb(236, 72, 72);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      border-radius: 50px;
+      padding: 12px 25px;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+    }
+
+    .fancy-btn:hover {
+      background: var(--gradient-primary);
+      color: rgb(221, 19, 19);
+      transform: translateY(-2px);
+    }
+
+    .btn-upload {
+      background: var(--gradient-primary);
+      color: rgb(228, 122, 122);
+      border: none;
+      border-radius: 50px;
+      padding: 12px 25px;
+      font-weight: 600;
+      transition: var(--transition);
+      font-size: 1.05rem;
+    }
+
+    .btn-upload:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    /* Formulaire stylisé */
+    .custom-file-input {
+      border: 2px dashed #073e86;
+      border-radius: 15px;
+      padding: 15px;
+      transition: var(--transition);
+      font-size: 1.05rem;
+    }
+
+    .custom-file-input:hover {
+      border-color: var(--primary);
+    }
+
+    .selected-file {
+      background: rgba(67, 97, 238, 0.08);
+      padding: 15px 20px;
+      border-radius: 15px;
+      border-left: 4px solid var(--primary);
+      font-size: 1.05rem;
+    }
+
+    .existing-badge {
+      background: rgba(76, 201, 240, 0.2);
+      color: #4cc9f0;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.05rem;
+      border: 1px solid #2cc8f8;
+    }
+
+    /* Image preview */
+    .preview-image img {
+      border-radius: 15px;
+      transition: var(--transition);
+      max-height: 350px;
+      object-fit: contain;
+      border: 1px solid #147ee7;
+    }
+
+    .preview-image img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* Loader personnalisé */
+    .custom-loader {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      margin: 30px auto;
+    }
+
+    .custom-loader:after {
+      content: " ";
+      display: block;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 8px solid var(--primary);
+      border-color: var(--primary) transparent var(--primary) transparent;
+      animation: custom-loader 1.2s linear infinite;
+    }
+
+    @keyframes custom-loader {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Table responsive */
+    .table-responsive {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .table th {
+      border-top: none;
+      font-weight: 700;
+      color: #495057;
+      width: 30%;
+      background-color: #3c95ee;
+      padding: 15px;
+      font-size: 1.05rem;
+    }
+
+    .table td {
+      padding: 15px;
+      font-size: 1.05rem;
+      vertical-align: middle;
+    }
+
+    /* Section catégories */
+    .field-label {
+      font-weight: 600;
+      color: #495057;
+      font-size: 1.05rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .app-container {
+        padding: 20px;
+      }
+      
+      .event-title {
+        font-size: 1.8rem;
+      }
+      
+      .card-body {
+        padding: 20px;
+      }
+      
+      .table th, .table td {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      .app-container {
+        padding: 15px;
+        border-radius: 15px;
+      }
+      
+      .event-title {
+        font-size: 1.6rem;
+      }
+      
+      .card-header {
+        padding: 15px 20px;
+      }
+      
+      .card-body {
+        padding: 20px 15px;
+      }
+      
+      .badge {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+      
+      .gravite-badge {
+        font-size: 1rem;
+        padding: 10px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Loader + gestion erreurs -->
+    <ng-container *ngIf="!isLoading; else loadingTpl">
+      <ng-container *ngIf="!errorMessage; else errorTpl">
+        <ng-container *ngIf="incident; else noDataTpl">
+
+          <!-- Header avec titre -->
+          <div class="event-header animate-fade-in">
+            <h3 class="event-title">Détails de l'Événement #{{ incident.id }}</h3>
+            <p class="mb-0 opacity-85">Informations complètes sur cet incident</p>
+          </div>
+
+          <!-- INFORMATIONS DÉCLARANT COMPACTES -->
+          <div class="card shadow-sm event-card animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Déclarant</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <span class="fw-bold me-2">👤</span>
+                <span class="badge bg-primary">Nom: <span class="admin-name">{{ incident.declarant?.userName || 'N/A' }}</span></span>
+                <span class="badge bg-secondary">Email: {{ incident.declarant?.email || 'N/A' }}</span>
+                <span class="badge bg-success">Tel: {{ incident.declarant?.tel || 'N/A' }}</span>
+                <span class="badge bg-warning text-dark">Fonction: {{ incident.declarant?.fonction || 'N/A' }}</span>
+                <span class="badge bg-info text-dark">Service: {{ incident.declarant?.service?.nom || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- INFORMATIONS INCIDENT -->
+          <div class="card shadow-sm event-card animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations Incident</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <table class="table table-borderless mb-0">
+                    <tbody>
+                      <tr><th>Code</th><td>{{ incident.code || 'N/A' }}</td></tr>
+                      <tr><th>Type</th><td><span class="badge type-badge">{{ getTypeLabel(incident.type) || 'N/A' }}</span></td></tr>
+                      <tr><th>Description</th><td>{{ incident.description || 'N/A' }}</td></tr>
+                      <tr><th>Date de survenue</th><td>{{ formatDate(incident.dateSurvenue) }}</td></tr>
+                      <tr><th>Date de détection</th><td>{{ formatDate(incident.dateDetection) }}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <table class="table table-borderless mb-0">
+                    <tbody>
+                      <tr><th>Date de déclaration</th><td>{{ formatDate(incident.dateDeclaration) }}</td></tr>
+                      <tr>
+                        <th>Gravité</th>
+                        <td>
+                          <span class="badge gravite-badge">
+                            <span class="gravite-counter">{{ incident.gravite }}</span>
+                            {{ getGraviteLabel(incident.gravite) }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr><th>Statut</th><td><span class="badge status-badge">{{ getStatusLabel(incident.statut) }}</span></td></tr>
+                      <tr>
+                        <th>Évitable</th>
+                        <td>
+                          <span class="boolean-badge" [ngClass]="{'true': getIncidentField('evitable'),'false':!getIncidentField('evitable')}">
+                            {{ getIncidentField('evitable') ? 'Oui' : 'Non' }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr><th>Mesures immédiates</th><td>{{ incident.mesureImmediat || 'N/A' }}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🏷️ Détails par catégorie -->
+          <div class="card shadow-sm event-card animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Détails par catégorie</h5>
+            </div>
+            <div class="card-body">
+              <ng-container *ngFor="let catKey of getCategoryKeys()">
+                <ng-container *ngIf="hasDefinedField(catKey) && isCategoryVisible(catKey)">
+                  
+                  <!-- Nom de la catégorie -->
+                  <div class="fw-bold text-uppercase mb-3 text-primary fs-5">{{ catKey }}</div>
+
+                  <!-- Champs regroupés en ligne -->
+                  <div class="d-flex flex-wrap gap-3 ms-3 mb-4">
+                    <ng-container *ngFor="let field of categories[catKey]">
+                      <div *ngIf="isFieldVisible(field)" class="d-flex align-items-center gap-2">
+                        
+                        <!-- Oui / Non -->
+                        <span class="boolean-badge"
+                              [ngClass]="{'true': getIncidentField(field.field), 'false': !getIncidentField(field.field)}">
+                          {{ getIncidentField(field.field) ? 'Oui' : 'Non' }}
+                        </span>
+
+                        <!-- Label -->
+                        <span class="field-label">{{ field.label }}</span>
+
+                        <!-- Précision -->
+                        <span *ngIf="field.hasPrecision && getIncidentField(field.hasPrecision)?.trim()"
+                              class="text-secondary small fst-italic">
+                          ➜ {{ getIncidentField(field.hasPrecision) }}
+                        </span>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- 👥 Éléments concernés regroupés -->
+          <div class="card shadow-sm event-card animate-fade-in" style="animation-delay: 0.4s;">
+            <div class="card-header bg-light">
+              <h5 class="mb-0"><i class="fas fa-users me-2"></i>Éléments concernés</h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="getConcerneGroup()?.valid">
+                <div class="d-flex flex-wrap gap-3">
+                  
+                  <!-- Boucle sur les éléments -->
+                  <ng-container *ngFor="let key of ['patient','personnel','visiteur','fournisseur','materiel','organisation']">
+                    <span *ngIf="getConcerneGroup().value[key]" 
+                          class="badge fs-6"
+                          [ngClass]="{
+                            'bg-primary': key === 'patient',
+                            'bg-secondary': key === 'personnel',
+                            'bg-success': key === 'visiteur',
+                            'bg-warning text-dark': key === 'fournisseur',
+                            'bg-info text-dark': key === 'materiel',
+                            'bg-dark': key === 'organisation'
+                          }">
+                      {{ key | titlecase }}
+                    </span>
+                  </ng-container>
+
+                  <!-- Autres -->
+                  <span *ngIf="getConcerneGroup().value.autres" class="badge bg-light text-dark fs-6">
+                    AUTRES
+                    <span *ngIf="getConcerneGroup().value.autresPrecision?.trim()" class="fst-italic small ms-1">
+                      ➜ {{ getConcerneGroup().value.autresPrecision }}
+                    </span>
+                  </span>
+
+                  <!-- Aucun -->
+                  <span *ngIf="!getConcerneGroup().value.patient && !getConcerneGroup().value.personnel &&
+                              !getConcerneGroup().value.visiteur && !getConcerneGroup().value.fournisseur &&
+                              !getConcerneGroup().value.materiel && !getConcerneGroup().value.organisation &&
+                              !getConcerneGroup().value.autres"
+                        class="text-muted fst-italic fs-6">
+                    Aucun élément concerné
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </ng-container>
+      </ng-container>
+    </ng-container>
+
+    <!-- Templates loader / erreur / pas de données -->
+    <ng-template #loadingTpl>
+      <div class="d-flex flex-column align-items-center justify-content-center py-5">
+        <div class="custom-loader"></div>
+        <p class="mt-3 text-primary fw-semibold fs-5">Chargement des détails de l'incident...</p>
+      </div>
+    </ng-template>
+
+    <ng-template #errorTpl>
+      <div class="alert alert-danger d-flex align-items-center animate-fade-in" role="alert">
+        <i class="fas fa-exclamation-circle me-3 fs-4"></i>
+        <div class="fs-5">{{ errorMessage }}</div>
+      </div>
+    </ng-template>
+
+    <ng-template #noDataTpl>
+      <div class="alert alert-warning d-flex align-items-center animate-fade-in" role="alert">
+        <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+        <div class="fs-5">Aucun incident disponible.</div>
+      </div>
+    </ng-template>
+
+    <!-- Boutons pour afficher les sections -->
+    <div class="mb-4 d-flex gap-3 flex-wrap animate-fade-in" style="animation-delay: 0.5s;">
+      <button class="fancy-btn" (click)="toggleGrille()">
+        <i class="fas fa-clipboard-list"></i> Grille d'Alarme
+      </button>
+      <button class="fancy-btn" (click)="toggleArbre()">
+        <i class="fas fa-project-diagram"></i> Arbre des Causes
+        </button>
+    </div>
+
+    <!-- Section Grille d'Alarme -->
+    <div class="card mt-4 event-card animate-fade-in" *ngIf="showGrille" style="animation-delay: 0.6s;">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Grille d'Alarme</h5>
+        <button class="btn btn-primary d-flex align-items-center" (click)="ouvrirGrilleAlarme()">
+          <i class="fas fa-edit me-2"></i> Remplir la Grille
+        </button>
+   <!--    </div>
+      <div class="card-body">
+        <div *ngIf="grillesAlarme && grillesAlarme.length > 0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>ID Grille</th>
+                  <th>Date</th>
+                  <th>Réponses</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let grille of grillesAlarme">
+                  <td class="fw-semibold">{{ grille.id }}</td>
+                  <td>{{ grille.dateCreation | date:'dd/MM/yyyy' }}</td>
+                  <td><span class="badge bg-primary">{{ grille.nombreReponses }}</span></td>
+                  <td>
+                    <button class="btn btn-info d-flex align-items-center" (click)="voirGrille(grille.id)">
+                      <i class="fas fa-eye me-2"></i> Voir
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div> -->
+        <div *ngIf="!grillesAlarme || grillesAlarme.length === 0" class="text-center text-muted py-5">
+          <i class="fas fa-inbox fa-3x mb-3"></i>
+          <p class="fs-5">Aucune grille d'alarme pour cet incident.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Upload Arbre des causes -->
+    <div class="card mt-4 event-card animate-fade-in" *ngIf="showArbre" style="animation-delay: 0.7s;">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Arbre des Causes - Incident #{{ incident?.id }}</h5>
+        <i class="fas fa-cloud-upload-alt text-primary fs-4"></i>
+      </div>
+
+      <div class="card-body">
+        <div class="mb-4">
+          <label class="form-label fw-semibold fs-5">Sélectionner un fichier image</label>
+          <input type="file" (change)="onFileSelected($event)" class="form-control custom-file-input" accept="image/*">
+        </div>
+
+        <div *ngIf="selectedFile" class="mb-4 selected-file animate-fade-in">
+          <p class="mb-0"><i class="fas fa-file me-2"></i>Fichier sélectionné : <em>{{ selectedFile.name }}</em></p>
+        </div>
+
+        <button class="btn btn-upload d-flex align-items-center mb-4" (click)="uploadImage()" [disabled]="!selectedFile || !incident?.id">
+          <i class="fas fa-cloud-upload-alt me-2"></i> Upload Image
+        </button>
+
+        <div *ngIf="incident?.imageUrl" class="mb-4 animate-fade-in">
+          <span class="existing-badge d-inline-flex align-items-center">
+            <i class="fas fa-check-circle me-2"></i> Arbre existant
+          </span>
+        </div>
+
+        <div *ngIf="incident?.imageUrl" class="text-center preview-image animate-fade-in">
+          <a [href]="incident.imageUrl" target="_blank">
+            <img [src]="incident.imageUrl" alt="Schéma incident" class="img-thumbnail" />
+          </a>
+          <p class="text-muted mt-3">Cliquez sur l'image pour l'agrandir</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

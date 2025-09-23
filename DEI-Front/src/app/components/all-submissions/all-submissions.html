@@ -1,0 +1,63 @@
+<div class="submissions-container">
+  <h1>Historique des soumissions</h1>
+
+  <!-- Filtre par Incident ID -->
+  <div class="filter-container">
+    <label for="incidentFilter">Filtrer par Incident ID:</label>
+    <input 
+      type="number" 
+      id="incidentFilter" 
+      [(ngModel)]="incidentFilter"
+      (input)="applyFilters()"
+      placeholder="ID de l'incident..."
+      min="1"
+    >
+    <button (click)="clearFilter()" class="clear-filter-btn">×</button>
+  </div>
+
+  <div *ngIf="filteredSubmissions.length > 0; else noSubmissions">
+    <table class="submissions-table">
+      <thead>
+       <tr>
+                  <th>ID Grille</th>
+                  <th>Date</th>
+                  <th>Réponses</th>
+                  <th>Actions</th>
+                </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sub of pagedSubmissions">
+          <td>{{ sub.id }}</td>
+          <td>{{ sub.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ sub.reponses.length }}</td>
+          <td>{{ sub.metadata?.incidentId || 'N/A' }}</td>
+          <td class="actions-cell">
+            <button class="view-btn" (click)="viewSubmission(sub.id)">Voir</button>
+          
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-controls">
+      <button (click)="prevPage()" [disabled]="currentPage === 1">Précédent</button>
+
+      <button *ngFor="let p of [].constructor(totalPages()); let i = index"
+              (click)="goToPage(i + 1)"
+              [class.active]="currentPage === (i + 1)">
+        {{ i + 1 }}
+      </button>
+
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages()">Suivant</button>
+    </div>
+  </div>
+
+  <ng-template #noSubmissions>
+    <p class="no-submissions-message" *ngIf="!isFiltering">
+      Aucune soumission enregistrée
+    </p>
+    <p class="no-results-message" *ngIf="isFiltering">
+      Aucune soumission trouvée pour l'incident ID: {{ incidentFilter }}
+    </p>
+  </ng-template>
+</div>

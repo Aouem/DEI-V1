@@ -1,0 +1,103 @@
+.response-yes {
+  color: green;
+  font-weight: bold;
+}
+
+.response-no {
+  color: red;
+  font-weight: bold;
+}
+
+.response-partial {
+  color: orange;
+  font-weight: bold;
+}
+
+.response-na {
+  color: gray;
+  font-style: italic;
+}
+
+.response-unknown {
+  color: darkgray;
+  font-style: italic;
+}
+
+.risk-high {
+  color: white;
+  background-color: #e74c3c;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+.risk-medium {
+  color: #f39c12;
+  font-weight: bold;
+}
+
+.risk-low {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.analysis-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 2px solid #2980b9;
+}
+
+.analysis-section h2 {
+  color: #2980b9;
+}
+
+.confirmation-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+.confirmation-header {
+  margin-bottom: 1rem;
+}
+
+.submission-info p {
+  margin: 0.1rem 0;
+}
+
+.actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background-color: #2980b9;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+button:hover {
+  background-color: #216a94;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+th, td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #2980b9;
+  color: white;
+}

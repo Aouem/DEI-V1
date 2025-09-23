@@ -1,0 +1,149 @@
+<div class="container my-5">
+  <div class="card shadow-sm rounded-3">
+    <div class="card-header bg-primary text-white text-center py-3">
+      <h2 class="mb-0 fw-bold">Liste des utilisateurs</h2>
+      <small>Gestion des comptes utilisateurs de l'application hospitalière</small>
+    </div>
+
+    <div class="card-body">
+      <!-- Message d'erreur -->
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = ''"></button>
+      </div>
+
+      <!-- Barre de recherche -->
+      <div class="mb-4">
+        <input
+          type="search"
+          class="form-control form-control-lg"
+          placeholder="Rechercher par nom, Email, rôle ou service..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchTermChange()"
+        />
+      </div>
+
+      <!-- Spinner -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive" *ngIf="!loading && pagedUsers.length > 0">
+        <table class="table table-hover table-bordered align-middle mb-0">
+          <thead class="table-primary text-primary">
+            <tr>
+              <th>Nom d'utilisateur</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Téléphone</th>
+              <th>Fonction</th>
+              <!-- <th>Service</th> -->
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of pagedUsers">
+              <td class="fw-semibold text-capitalize">{{ user.userName }}</td>
+              <td class="text-truncate" style="max-width: 250px;">{{ user.email }}</td>
+              <td>
+                <span
+                  class="badge text-uppercase"
+                  [ngClass]="{
+                    'bg-success': user.role?.toLowerCase() === 'admin',
+                    'bg-warning text-dark': user.role?.toLowerCase() === 'validateur',
+                    'bg-info text-dark': user.role?.toLowerCase() === 'declarant',
+                    'bg-secondary': !user.role
+                  }"
+                >
+                  {{ user.role || '—' }}
+                </span>
+              </td>
+              <td>{{ user.tel || '—' }}</td>
+              <td>{{ user.fonction || '—' }}</td>
+              <!-- <td>{{ user.service?.nom || '—' }}</td> -->
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary me-2" (click)="editUser(user)">
+                  <i class="bi bi-pencil-square"></i> Modifier
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="userToDelete = user"
+                >
+                  <i class="bi bi-trash"></i> Supprimer
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Message si aucun utilisateur -->
+      <div *ngIf="!loading && pagedUsers.length === 0" class="text-center text-warning my-4">
+        Aucun utilisateur trouvé.
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="!loading && totalPages > 1" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="changePage(currentPage - 1)">&laquo; Précédent</button>
+          </li>
+          <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+            <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link" (click)="changePage(currentPage + 1)">Suivant &raquo;</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmation suppression -->
+<div *ngIf="userToDelete" class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Confirmation de suppression</h5>
+        <button type="button" class="btn-close" (click)="userToDelete = null"></button>
+      </div>
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer <b>{{ userToDelete.userName }}</b> ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="userToDelete = null">Annuler</button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteUser(userToDelete)"
+        >
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal modification utilisateur -->
+<div *ngIf="selectedUser" class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Modifier l'utilisateur</h5>
+        <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulaire de modification ici -->
+        <p>Fonctionnalité de modification à implémenter</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="updateUser(selectedUser)">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

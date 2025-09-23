@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grille ALARM avec réponses</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px auto;
+      max-width: 900px;
+      padding: 0 15px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+    section {
+      background: white;
+      padding: 20px 25px;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+    h2 {
+      border-bottom: 3px solid #2980b9;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      color: #2980b9;
+      font-weight: 700;
+    }
+    h3 {
+      margin-top: 1.5rem;
+      color: #34495e;
+      font-weight: 600;
+    }
+    .question {
+      font-style: italic;
+      color: #555;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+    textarea {
+      width: 100%;
+      max-width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    textarea:focus {
+      border-color: #2980b9;
+      outline: none;
+      box-shadow: 0 0 5px rgba(41, 128, 185, 0.5);
+    }
+    label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 5px;
+      color: #2c3e50;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #3498db;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .error-message {
+      color: #e74c3c;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .success-message {
+      color: #27ae60;
+      margin: 10px 0;
+      text-align: center;
+    }
+    @media (max-width: 600px) {
+      body {
+        margin: 10px;
+        padding: 0 10px;
+      }
+      h2 {
+        font-size: 1.3rem;
+      }
+      h3 {
+        font-size: 1.1rem;
+      }
+      textarea {
+        font-size: 0.9rem;
+      }
+      .buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Grille ALARM Commentée</h1>
+
+  <!-- Messages d'erreur/succès -->
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+<style>
+  .success-message {
+    color: green;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #f0fff0;
+    border: 1px solid green;
+    border-radius: 4px;
+  }
+</style>
+  <!-- Formulaire -->
+  <form [formGroup]="form">
+    <!-- Facteurs liés au patient -->
+    <section *ngIf="currentPage === 1">
+      <h2>🧠 1. Facteurs liés au patient</h2>
+
+      <h3>1.1 Antécédents médicaux, habitus</h3>
+      <p class="question">Les antécédents médicaux du patient ont-ils influencé le cours de l'événement ?</p>
+      <label for="reponse-1-1">Réponse :</label>
+      <textarea id="reponse-1-1" formControlName="reponse-1-1" rows="3"></textarea>
+
+      <h3>1.2 État de santé (pathologies, co-morbidités)</h3>
+      <p class="question">Est-ce que l'âge du patient, la gravité de son état ou la complexité de son cas ont pu contribuer à la survenue de cet événement ? Quel était le pronostic vital ou fonctionnel du patient au moment de l'acte ?</p>
+      <label for="reponse-1-2">Réponse :</label>
+      <textarea id="reponse-1-2" formControlName="reponse-1-2" rows="3"></textarea>
+
+      <h3>1.3 Traitements</h3>
+      <p class="question">Le patient présentait-il un risque connu ayant influencé l'événement (ex : un traitement particulier) ?</p>
+      <label for="reponse-1-3">Réponse :</label>
+      <textarea id="reponse-1-3" formControlName="reponse-1-3" rows="3"></textarea>
+
+      <h3>1.4 Personnalité, facteurs sociaux ou familiaux</h3>
+      <p class="question">Le patient avait-il des problèmes d'expression ? Une communication difficile ? La langue parlée et comprise par le patient était-elle une difficulté lors de la prise en charge ? Des facteurs sociaux ont-ils participé à la survenue de l'événement ? Est-ce que le patient/son entourage était utile et coopératif ?</p>
+      <label for="reponse-1-4">Réponse :</label>
+      <textarea id="reponse-1-4" formControlName="reponse-1-4" rows="3"></textarea>
+
+      <h3>1.5 Relations conflictuelles</h3>
+      <p class="question">Quelle était la relation du patient avec les soignants et les soins ? Quelle était l'implication du patient dans la prise en charge thérapeutique (indifférent, opposant, ...) ?</p>
+      <label for="reponse-1-5">Réponse :</label>
+      <textarea id="reponse-1-5" formControlName="reponse-1-5" rows="3"></textarea>
+    </section>
+
+    <!-- Facteurs liés aux tâches -->
+    <section *ngIf="currentPage === 2">
+      <h2>🛠️ 2. Facteurs liés aux tâches à accomplir</h2>
+
+      <h3>2.1 Protocoles (indisponibles, non adaptés ou non utilisés)</h3>
+      <p class="question">Existe-t-il des protocoles en rapport avec les actes ou le processus en cause dans l'événement ? Si les protocoles existent, sont-ils connus, disponibles et utilisés ? Les protocoles sont-ils toujours d'actualité ?</p>
+      <label for="reponse-2-1">Réponse :</label>
+      <textarea id="reponse-2-1" formControlName="reponse-2-1" rows="3"></textarea>
+
+      <h3>2.2 Résultats d'examens complémentaires (non disponibles ou non pertinents)</h3>
+      <p class="question">Les examens complémentaires ont-ils été réalisés et les résultats disponibles en temps utile ? Existe-il un accord (consensus) concernant l'interprétation des résultats d'examens ?</p>
+      <label for="reponse-2-2">Réponse :</label>
+      <textarea id="reponse-2-2" formControlName="reponse-2-2" rows="3"></textarea>
+
+      <h3>2.3 Aides à la décision (équipements spécifiques, algorithmes décisionnels, logiciels, recommandations)</h3>
+      <p class="question">Les moyens nécessaires à une prise de décision existent-ils ?, Sont-ils disponibles ?, Ont-ils été utilisés ?</p>
+      <label for="reponse-2-3">Réponse :</label>
+      <textarea id="reponse-2-3" formControlName="reponse-2-3" rows="3"></textarea>
+
+      <h3>2.4 Définition des tâches</h3>
+      <p class="question">Les tâches concernées étaient-elles bien définies ? La définition des tâches prend-t-elle en compte les compétences des différentes professions ? La définition des tâches est-elle connue, partagée, respectée dans l'équipe ? Existe-t-il une incompréhension de la part du personnel sur les tâches à effectuer ?</p>
+      <label for="reponse-2-4">Réponse :</label>
+      <textarea id="reponse-2-4" formControlName="reponse-2-4" rows="3"></textarea>
+
+      <h3>2.5 Programmation, planification</h3>
+      <p class="question">Les tâches concernées étaient-elles planifiées ? L'intervention était-elle programmée ? Le programme a-t-il été respecté, modifié ? La personne appropriée a-t-elle été consultée quand cela était nécessaire pour le déroulement des soins ?</p>
+      <label for="reponse-2-5">Réponse :</label>
+      <textarea id="reponse-2-5" formControlName="reponse-2-5" rows="3"></textarea>
+    </section>
+
+    <!-- Facteurs liés à l'individu (soignant) -->
+    <section *ngIf="currentPage === 3">
+      <h2>👩‍⚕️ 3. Facteurs liés à l'individu (soignant)</h2>
+
+      <h3>3.1 Qualifications, compétences</h3>
+      <p class="question">Pensez-vous que vous aviez suffisamment de connaissances et d'expérience pour prendre en charge ce problème, cette complication ? Aviez-vous déjà réalisé ce geste, cette procédure ?</p>
+      <label for="reponse-3-1">Réponse :</label>
+      <textarea id="reponse-3-1" formControlName="reponse-3-1" rows="3"></textarea>
+
+      <h3>3.2 Facteurs de stress physique ou psychologique</h3>
+      <p class="question">Vous sentiez-vous fatigué, affamé ou malade ? Etiez-vous stressé ?</p>
+      <label for="reponse-3-2">Réponse :</label>
+      <textarea id="reponse-3-2" formControlName="reponse-3-2" rows="3"></textarea>
+    </section>
+
+    <!-- Facteurs liés à l'équipe -->
+    <section *ngIf="currentPage === 4">
+      <h2>👥 4. Facteurs liés à l'équipe</h2>
+
+      <h3>4.1 Communication entre professionnels</h3>
+      <p class="question">La communication entre vous-même et les autres membres de l'équipe est-elle effective ? La communication est-elle précise, complète et non ambigüe ? Utilise-t-elle un vocabulaire standard (commun) et pas de jargon ? Est-il possible d'exprimer des désaccords ou des préoccupations au sein de l'équipe ? Existe-t-il un temps ou un espace pour cela ? La collaboration et l'ambiance sont-elles satisfaisantes ? Comment qualifieriez-vous la qualité relationnelle dans l'équipe de travail (ambiance, existence de conflits...) ? Est-ce que la communication entre votre service (département ou pôle) et les autres services (départements ou pôles) est effective ?</p>
+      <label for="reponse-4-1">Réponse :</label>
+      <textarea id="reponse-4-1" formControlName="reponse-4-1" rows="3"></textarea>
+
+      <h3>4.2 Communication vers le patient et son entourage</h3>
+      <p class="question">L'équipe a t'elle eu (passé) suffisamment de temps avec le patient pour lui expliquer les procédures et les conséquences possibles ou complications ? Ya t-il eu des difficultés linguistiques, culturelles ou des incompréhensions entre l'équipe et le patient et son entourage ? Quelles-sont les habitudes du service en termes d'information du patient et de son entourage ?</p>
+      <label for="reponse-4-2">Réponse :</label>
+      <textarea id="reponse-4-2" formControlName="reponse-4-2" rows="3"></textarea>
+
+      <h3>4.3 Informations écrites (dossier patient...)</h3>
+      <p class="question">Les dossiers des patients (supports d'informations) sont-ils accessibles, lisibles, identifiés, et complets ? Les dossiers des patients (supports d'informations) mettent-ils suffisamment en évidence les facteurs de risques ? Quel est le niveau de partage des informations écrites dans l'équipe (nombre de supports, confidentialité...) ?</p>
+      <label for="reponse-4-3">Réponse :</label>
+      <textarea id="reponse-4-3" formControlName="reponse-4-3" rows="3"></textarea>
+
+      <h3>4.4 Transmissions et alertes</h3>
+      <p class="question">Comment sont rapportées et partagées les informations cruciales pour la prise en charge du patient entre professionnels ? Les informations sur l'évaluation des patients sont-elles partagées et utilisées par les membres de l'équipe de soins en temps utile ?</p>
+      <label for="reponse-4-4">Réponse :</label>
+      <textarea id="reponse-4-4" formControlName="reponse-4-4" rows="3"></textarea>
+
+      <h3>4.5 Répartition des tâches</h3>
+      <p class="question">Comment s'organise le travail entre les membres de l'équipe ? L'équipe est-elle d'accord sur la répartition des tâches ? A-t-il été défini qui prend en charge le patient ou réalise un acte particulier ?</p>
+      <label for="reponse-4-5">Réponse :</label>
+      <textarea id="reponse-4-5" formControlName="reponse-4-5" rows="3"></textarea>
+
+      <h3>4.6 Encadrement, Supervision</h3>
+      <p class="question">Avez-vous eu un encadrement (supervision) ou un soutien suffisant ? Un conseil ou l'aide d'un autre membre de l'équipe étaient-ils disponibles tout le temps ? La communication entre le management/supervision et l'équipe de soins est-elle adéquate ? Les coordonnées des spécialistes à appeler en cas d'urgence vitale sont-elles disponibles dans le secteur d'activité ?</p>
+      <label for="reponse-4-6">Réponse :</label>
+      <textarea id="reponse-4-6" formControlName="reponse-4-6" rows="3"></textarea>
+
+      <h3>4.7 Demandes de soutien ou comportements face aux incidents</h3>
+      <p class="question">Quels soutiens sont disponibles en cas de problèmes ? Avez-vous eu un soutien suffisant ? Existe-t-il un soutien effectif dans l'équipe ?</p>
+      <label for="reponse-4-7">Réponse :</label>
+      <textarea id="reponse-4-7" formControlName="reponse-4-7" rows="3"></textarea>
+    </section>
+
+    <!-- Facteurs liés à l'environnement de travail -->
+    <section *ngIf="currentPage === 5">
+      <h2>🏥 5. Facteurs liés à l'environnement de travail</h2>
+
+      <h3>5.1 Administration</h3>
+      <p class="question">Est-ce que les règlements et les procédures administratifs sont communiqués de façon adéquate ?</p>
+      <label for="reponse-5-1">Réponse :</label>
+      <textarea id="reponse-5-1" formControlName="reponse-5-1" rows="3"></textarea>
+
+      <h3>5.2 Locaux (fonctionnalité, maintenance, hygiène...)</h3>
+      <p class="question">Est-ce que votre pratique a été affectée par l'environnement de travail (chaleur, bruit..) ? Est-ce que les locaux sont adaptés au type de prise en charge ?</p>
+      <label for="reponse-5-2">Réponse :</label>
+      <textarea id="reponse-5-2" formControlName="reponse-5-2" rows="3"></textarea>
+
+      <h3>5.3 Déplacements, transferts de patients entre unités ou sites</h3>
+      <p class="question">Les modalités de déplacement du patient ont-elles participé à la survenue de l'événement ? Des circuits et des modes de transport spécifiques ont-ils été définis pour les différents types de prise en charge (hospitalisation complète programmée, chirurgie ambulatoire, urgences immédiates, urgences différées).</p>
+      <label for="reponse-5-3">Réponse :</label>
+      <textarea id="reponse-5-3" formControlName="reponse-5-3" rows="3"></textarea>
+
+      <h3>5.4 Fournitures ou équipements (non disponibles, inadaptés ou défectueux)</h3>
+      <p class="question">Avez-vous disposé des fournitures ou des matériels médicaux nécessaires ? Est-ce que tous les équipements que vous avez utilisé ont fonctionné de façon adéquate et efficacement ? Est-ce qu'il y avait une information suffisante et fiable concernant tous les équipements ? Comment a été assurée la formation des professionnels à l'utilisation de ce matériel ? L'établissement dispose t-il d'un programme de maintenance ? Comment est assuré le dépannage d'urgence des équipements en panne, notamment concernant les dispositifs biomédicaux critiques ? Cette procédure est-elle connue des professionnels ?</p>
+      <label for="reponse-5-4">Réponse :</label>
+      <textarea id="reponse-5-4" formControlName="reponse-5-4" rows="3"></textarea>
+
+      <h3>5.5 Informatique (disponibilité, fonctionnement, maintenance)</h3>
+      <p class="question">Le système d'information est-il adapté aux orientations stratégiques de l'établissement, du service ? Le système d'information facilite t-il l'accès en temps utile à des informations valides ? Le système d'information aide t-il les professionnels dans leur processus de décision ? Existe-t-il des difficultés de fonctionnement du système d'information ? Existe-t-il plusieurs systèmes d'information ? Le système d'information du bloc opératoire est-il intégré au système d'information hospitalier ?</p>
+      <label for="reponse-5-5">Réponse :</label>
+      <textarea id="reponse-5-5" formControlName="reponse-5-5" rows="3"></textarea>
+
+      <h3>5.6 Effectifs (adaptés en nombre ou en compétences)</h3>
+      <p class="question">La composition de l'équipe était-elle appropriée ? Des règles de présence ainsi qu'un système de gardes et astreintes sont-ils définis afin d'assurer la permanence des soins 24h/24 ? Si oui, ces informations sont-elles connues des professionnels ?</p>
+      <label for="reponse-5-6">Réponse :</label>
+      <textarea id="reponse-5-6" formControlName="reponse-5-6" rows="3"></textarea>
+
+      <h3>5.7 Charge de travail, temps de travail</h3>
+      <p class="question">Avez-vous eu une augmentation de la charge de travail non prévue ou soudaine ? Avez-vous dû faire face à (ou hiérarchiser) plus d'un cas en même temps ? Deviez-vous passer du temps à des activités non cliniques ?</p>
+      <label for="reponse-5-7">Réponse :</label>
+      <textarea id="reponse-5-7" formControlName="reponse-5-7" rows="3"></textarea>
+
+      <h3>5.8 Retards, délais</h3>
+      <p class="question">Y a-t-il eu des retards dans la mise en œuvre des procédures de soins ?</p>
+      <label for="reponse-5-8">Réponse :</label>
+      <textarea id="reponse-5-8" formControlName="reponse-5-8" rows="3"></textarea>
+    </section>
+
+    <!-- Facteurs liés à l'organisation et au management -->
+    <section *ngIf="currentPage === 6">
+      <h2>📊 6. Facteurs liés à l'organisation et au management</h2>
+
+      <h3>6.1 Structure hiérarchique (organigramme, niveaux décisionnels)</h3>
+      <p class="question">Comment la structure hiérarchique ou des niveaux décisionnels trop nombreux ont-ils influencés négativement le cours de l'événement ? Les circuits de décision et de délégation sont-ils définis, diffusés et connus des professionnels ?</p>
+      <label for="reponse-6-1">Réponse :</label>
+      <textarea id="reponse-6-1" formControlName="reponse-6-1" rows="3"></textarea>
+
+      <h3>6.2 Gestion des ressources humaines, intérim, remplaçant</h3>
+      <p class="question">Les compétences nécessaires à une fonction ou à un service sont elles identifiées ? Existe-t-il une organisation afin d'intégrer tout nouvel arrivant dans l'établissement (information sur l'établissement et le secteur d'activité, lui permettant l'exercice de sa fonction) ? Pensez-vous que votre période d'adaptation à l'hôpital/spécialité/service vous a préparé à cette situation ? Avez-vous du collaborer avec un nouveau médecin ou personnel de soins (intérim) avec qui vous n'aviez jamais travaillé ?</p>
+      <label for="reponse-6-2">Réponse :</label>
+      <textarea id="reponse-6-2" formControlName="reponse-6-2" rows="3"></textarea>
+
+      <h3>6.3 Politique de formation continue</h3>
+      <p class="question">Existe-t-il un plan de formation continue établi en accord avec les besoins des services ? Les actes ou procédures de soins nécessitant une formation ou un entrainement sont-ils identifiés ?</p>
+      <label for="reponse-6-3">Réponse :</label>
+      <textarea id="reponse-6-3" formControlName="reponse-6-3" rows="3"></textarea>
+
+      <h3>6.4 Gestion de la sous-traitance</h3>
+      <p class="question">Comment la fonction sous-traitée est-elle intégrée dans le fonctionnement du service et de l'équipe ?</p>
+      <label for="reponse-6-4">Réponse :</label>
+      <textarea id="reponse-6-4" formControlName="reponse-6-4" rows="3"></textarea>
+
+      <h3>6.5 Politique d'achat</h3>
+      <p class="question">Existe-t-il une politique d'achat ou d'approvisionnement prenant en compte les besoins des services, des utilisateurs et des patients ? Comment sont assurés les approvisionnements en situation normale, en urgence, les jours fériés, les week-ends ?</p>
+      <label for="reponse-6-5">Réponse :</label>
+      <textarea id="reponse-6-5" formControlName="reponse-6-5" rows="3"></textarea>
+
+      <h3>6.6 Management de la qualité, sécurité, hygiène et environnement</h3>
+      <p class="question">Comment qualifieriez-vous la culture sécurité de l'établissement ? Existe-t-il une politique d'amélioration de la qualité et de la sécurité des soins diffusée dans l'établissement et connue des professionnels ? L'établissement évalue t-il et hiérarchise t'il les risques dans les secteurs d'activité ? Existe-t-il des plans d'actions d'amélioration de la qualité et de la sécurité des soins mis en oeuvre dans le secteur d'activité ? Existe-t-il une gestion documentaire dans l'établissement ? Si oui, la gestion documentaire définit-elle les modalités de rédaction, de diffusion et de révision des documents ? Les situations mettant en jeu la sécurité des biens et des personnes sont-elles identifiées ? Existe-t-il un document unique établi sur les conditions de travail des personnels ? Si oui, un plan d'amélioration des conditions de travail est-il défini ?</p>
+      <label for="reponse-6-6">Réponse :</label>
+      <textarea id="reponse-6-6" formControlName="reponse-6-6" rows="3"></textarea>
+
+      <h3>6.7 Ressources financières</h3>
+      <p class="question">Existe-t-il des facteurs financiers ayant influencé cet événement ? L'établissement décline t-il en interne des objectifs prévisionnels de dépenses et s'il y a lieu de recettes ?</p>
+      <label for="reponse-6-7">Réponse :</label>
+      <textarea id="reponse-6-7" formControlName="reponse-6-7" rows="3"></textarea>
+    </section>
+
+    <!-- Facteurs liés au contexte institutionnel -->
+    <section *ngIf="currentPage === 7">
+      <h2>🏛️ 7. Facteurs liés au contexte institutionnel</h2>
+
+      <h3>7.1 Politique de santé publique nationale</h3>
+      <p class="question">L'établissement fait-il l'objet actuellement de mesures de la part d'un organe de l'état ? Existe-t-il des contraintes réglementaires en vigueur pour cet établissement ayant influencé le déroulement de l'événement ? (CPOM,…)</p>
+      <label for="reponse-7-1">Réponse :</label>
+      <textarea id="reponse-7-1" formControlName="reponse-7-1" rows="3"></textarea>
+
+      <h3>7.2 Politique de santé publique régionale</h3>
+      <p class="question">L'établissement a-t-il mis en place des partenariats en cohérence avec les pathologies qu'il prend en charge ? L'établissement est-il organisé en relation avec d'autres établissements pour le type de prise en charge concerné par l'événement ? Dans l'affirmative, le personnel connaît-il les modalités de cette organisation ?</p>
+      <label for="reponse-7-2">Réponse :</label>
+      <textarea id="reponse-7-2" formControlName="reponse-7-2" rows="3"></textarea>
+
+      <h3>7.3 Systèmes de signalement</h3>
+      <p class="question">L'événement s'est-il déjà produit dans l'établissement ? Le personnel déclare-t-il les événements qu'il rencontre ? Comment est organisé l'établissement pour recueillir et analyser les événements indésirables ?</p>
+      <label for="reponse-7-3">Réponse :</label>
+      <textarea id="reponse-7-3" formControlName="reponse-7-3" rows="3"></textarea>
+    </section>
+
+    <!-- Navigation buttons -->
+    <div class="buttons">
+      <button type="button" (click)="previousPage()" [disabled]="currentPage === 1">Précédent</button>
+      <button type="button" (click)="nextPage()" [disabled]="currentPage === 7">Suivant</button>
+      <button type="button" (click)="onSubmit()" *ngIf="currentPage === 7" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Envoi en cours...' : 'Soumettre' }}
+      </button>
+    </div>
+  </form>
+</body>
+</html>

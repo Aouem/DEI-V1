@@ -1,0 +1,172 @@
+/* Container carte */
+.card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: none;
+}
+
+/* En-tête de la carte */
+.card-header {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  box-shadow: inset 0 -3px 8px rgba(255, 255, 255, 0.2);
+}
+
+/* Table : coins arrondis et ombre portée */
+.table {
+  border-collapse: separate !important;
+  border-spacing: 0 12px !important;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Lignes du tableau avec fond blanc, ombre et séparation */
+.table tbody tr {
+  background-color: #fefefe;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 0.75rem;
+  cursor: default;
+}
+
+/* Effet au survol de la ligne */
+.table tbody tr:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  transform: translateY(-4px);
+  background-color: #e6f0ff;
+}
+
+/* Cellules avec padding et texte aéré */
+.table th,
+.table td {
+  padding: 1rem 1.5rem;
+  vertical-align: middle;
+  font-weight: 500;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* En-tête avec fond dégradé doux */
+.table thead th {
+  background: linear-gradient(90deg, #4a90e2, #357abd);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none !important;
+}
+
+/* Badges : coins arrondis et couleurs douces */
+.badge {
+  font-weight: 600;
+  padding: 0.4em 0.85em;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+/* Couleurs des badges par rôle */
+.badge.bg-success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.badge.bg-warning {
+  background-color: #ffb300;
+  color: #333;
+}
+
+.badge.bg-info {
+  background-color: #29b6f6;
+  color: #fff;
+}
+
+.badge.bg-secondary {
+  background-color: #9e9e9e;
+  color: white;
+}
+
+/* Pagination boutons */
+.pagination .page-link {
+  border-radius: 50% !important;
+  width: 40px;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
+  margin: 0 6px;
+  font-weight: 600;
+  color: #357abd;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #357abd !important;
+  color: white !important;
+  border-color: #357abd !important;
+  box-shadow: 0 0 8px #357abdaa;
+}
+
+.pagination .page-link:hover {
+  background-color: #d7e3ff;
+  border-color: #357abd;
+  color: #1e3a70;
+}
+
+/* Boutons précédent/suivant avec flèches et coins arrondis */
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+  border-radius: 0.5rem !important;
+  width: auto;
+  padding: 0 1rem;
+  font-weight: 700;
+}
+
+/* Input recherche */
+input.form-control {
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  border: 2px solid #357abd;
+  transition: border-color 0.3s ease;
+}
+
+input.form-control:focus {
+  border-color: #1e3a70;
+  box-shadow: 0 0 10px #357abd88;
+  outline: none;
+}
+/* Titre principal */
+h2.mb-0.fw-bold {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #1e3a70; /* bleu foncé très pro */
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sous-titre */
+small {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #555;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.table-responsive {
+  display: flex;
+  justify-content: center; /* centre horizontalement */
+}
+
+.table {
+  width: auto !important;  /* désactive le 100% par défaut */
+  min-width: 600px;        /* largeur minimale agréable */
+  max-width: 900px;        /* largeur max pour éviter que ça soit trop large */
+  margin: 0 auto;          /* centrage horizontal */
+}

@@ -1,0 +1,58 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h2>Bienvenue, {{ currentUser?.userName }}</h2>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <div class="cards-container">
+    <ng-container *ngIf="isAdmin || isValidateur">
+      
+      <!-- Arbre des causes -->
+      <div class="card arbre-card" (click)="navigateTo('/arbre-de-cause')">
+        <div class="card-icon">🌳</div>
+        <div class="card-content">
+          <h3>Arbre des causes</h3>
+          <p>Voir arbre des causes</p>
+        </div>
+      </div>
+
+      <!-- Soumissions -->
+      <div class="card submissions-card" (click)="navigateTo('/all-submissions')">
+        <div class="card-icon">📄</div>
+        <div class="card-content">
+          <h3>Soumissions</h3>
+          <p>Voir toutes les soumissions</p>
+        </div>
+      </div>
+
+      <!-- Statistiques -->
+      <div class="card stats-card" (click)="navigateTo('/detail-extra')">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <h3>Statistiques</h3>
+          <p>Voir Statistiques</p>
+        </div>
+      </div>
+
+      <!-- 🔹 Incidents aujourd'hui -->
+<div class="incident-counter">
+  <h3>Incidents aujourd'hui</h3>
+  <div class="incident-number" [ngClass]="getIncidentClass(todayIncidentCount)">
+    {{ todayIncidentCount }}
+  </div>
+
+  <ul *ngIf="todayIncidentCount > 0">
+    <li *ngFor="let key of severityKeys()" [ngStyle]="{'color': getSeverityColor(key)}">
+      Gravité {{ key }} : {{ severityCount[key] }}
+    </li>
+  </ul>
+</div>
+
+
+
+<footer class="dashboard-footer">
+  <span class="footer-text">HMB</span>
+  <div class="bubbles">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+</footer>

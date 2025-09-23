@@ -1,0 +1,92 @@
+<div class="confirmation-container">
+  <div class="confirmation-header">
+    <h1>Grille ALARM - Récapitulatif des réponses</h1>
+    <div class="submission-info">
+      <p><strong>ID :</strong> {{ submissionId }}</p>
+      <p><strong>Date :</strong> {{ submissionDate | date:'dd/MM/yyyy à HH:mm' }}</p>
+            <p><strong>Incident :</strong> {{ incidentId }}</p> <!-- Ajouté -->
+
+    </div>
+  </div>
+
+  <div *ngIf="hasData; else noData">
+    <!-- Affichage groupé des réponses par catégorie -->
+    <div *ngFor="let category of (groupedResponses | keyvalue)">
+      <h2>{{ getCategoryDisplayName(category.key) }}</h2>
+      <p><em>Statistiques : {{ getCategoryStats(category.value) }}</em></p>
+
+      <div *ngFor="let sub of getSubCategories(category.value)">
+        <h3>{{ sub.name }} ({{ getSubCategoryStats(sub.responses) }})</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Question #</th>
+              <th>Question</th>
+              <th>Réponse</th>
+              <th>Détails</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let resp of sub.responses" [ngClass]="getResponseClass(resp.response)">
+              <td>{{ getQuestionNumber(resp.id) }}</td>
+              <td>{{ resp.question }}</td>
+              <td>{{ getResponseDisplay(resp.response) }}</td>
+              <td>{{ resp.details || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Nouvelle section : Analyse des causes profondes -->
+    <section class="analysis-section">
+      <h2>Analyse des causes profondes</h2>
+
+      <h3>Résumé par catégorie</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Catégorie</th>
+            <th>Total questions</th>
+            <th>Oui</th>
+            <th>Non</th>
+            <th>Partiellement</th>
+            <th>Niveau de risque</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cat of (categoryRiskScores | keyvalue)">
+            <td>{{ cat.key }}</td>
+            <td>{{ cat.value.total }}</td>
+            <td>{{ cat.value.yes }}</td>
+            <td>{{ cat.value.no }}</td>
+            <td>{{ cat.value.partial }}</td>
+            <td [ngClass]="{
+                'risk-high': cat.value.riskLevel === 'Élevé',
+                'risk-medium': cat.value.riskLevel === 'Moyen',
+                'risk-low': cat.value.riskLevel === 'Faible'
+              }">{{ cat.value.riskLevel }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Questions à investiguer</h3>
+      <ul>
+        <li *ngFor="let q of questionsToInvestigate">
+          <strong>{{ getQuestionNumber(q.id) }} - {{ q.question }}</strong><br/>
+          Réponse : <span [ngClass]="getResponseClass(q.response)">{{ getResponseDisplay(q.response) }}</span><br/>
+          Détails : {{ q.details || '-' }}
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <ng-template #noData>
+    <p>Aucune donnée de soumission disponible.</p>
+  </ng-template>
+
+  <div class="actions">
+    <button (click)="goToAllSubmissions()">Retour à la liste</button>
+    <button (click)="printPage()">Imprimer</button>
+  </div>
+</div>

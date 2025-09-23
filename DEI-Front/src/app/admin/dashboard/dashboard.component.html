@@ -1,0 +1,89 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h2>Bienvenue, {{ currentUser?.userName }}</h2>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <div class="cards-container">
+    <!-- 1. Incidents List Card -->
+    <div class="card incidents-list-card position-relative" (click)="navigateTo('/incidents-list')">
+      <div class="card-icon">📋</div>
+      <div class="card-content">
+        <h3>Liste des incidents</h3>
+        <p>Voir tous les incidents</p>
+      </div>
+      <span *ngIf="newIncidentCount > 0" class="big-blinking-lamp position-absolute top-0 start-100 translate-middle">💡</span>
+    </div>
+
+    <!-- 2. Incident Form Card -->
+    <div class="card incident-card" (click)="navigateTo('/incident-form')">
+      <div class="card-icon">⚠️</div>
+      <div class="card-content">
+        <h3>Incident Form</h3>
+        <p>Créer un nouvel incident</p>
+      </div>
+    </div>
+
+    <!-- 3. Arbre des causes -->
+    <div class="card arbre-card" (click)="navigateTo('/arbre-de-cause')">
+      <div class="card-icon">🌳</div>
+      <div class="card-content">
+        <h3>Arbre des causes</h3>
+        <p>Voir arbre des causes</p>
+      </div>
+    </div>
+
+    <!-- 4. Submissions Card -->
+    <div class="card submissions-card" (click)="navigateTo('/all-submissions')">
+      <div class="card-icon">📄</div>
+      <div class="card-content">
+        <h3>Soumissions</h3>
+        <p>Voir toutes les soumissions</p>
+      </div>
+    </div>
+
+    <!-- 5. Services Card -->
+    <div class="card services-card" (click)="navigateTo('/services')">
+      <div class="card-icon">🛠️</div>
+      <div class="card-content">
+        <h3>Services</h3>
+        <p>Gérer les services</p>
+      </div>
+    </div>
+
+    <!-- 6. Users Card -->
+    <div class="card users-card" (click)="navigateTo('/utilisateurs')">
+      <div class="card-icon">👤</div>
+      <div class="card-content">
+        <h3>Utilisateurs</h3>
+        <p>Gérer les utilisateurs</p>
+      </div>
+    </div>
+
+    <!-- 7. User Form Card -->
+    <div class="card user-form-card" (click)="navigateTo('/user-form')">
+      <div class="card-icon">📝</div>
+      <div class="card-content">
+        <h3>Créer un utilisateur</h3>
+        <p>Ajouter un nouvel utilisateur</p>
+      </div>
+    </div>
+
+    <!-- 8. Statistiques -->
+    <div class="card stats-card" (click)="navigateTo('/detail-extra')">
+      <div class="card-icon">📊</div>
+      <div class="card-content">
+        <h3>Statistiques</h3>
+        <p>Voir Statistiques</p>
+      </div>
+    </div>
+  </div>
+    <!-- Footer -->
+
+</div>
+<footer class="dashboard-footer">
+  <span class="footer-text">HMB</span>
+  <div class="bubbles">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+</footer>

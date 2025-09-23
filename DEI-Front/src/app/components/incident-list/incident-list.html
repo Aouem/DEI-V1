@@ -1,0 +1,75 @@
+<div class="table-responsive rounded-4 shadow-sm">
+  <h3 class="mb-3 fw-bold text-primary text-center">
+    Liste des incidents
+  </h3>
+  <table class="table table-hover align-middle mb-0">
+    <thead>
+      <tr class="incident-table-header">
+        <th class="ps-4 py-3">Code</th>
+        <th class="py-3">Date</th>
+        <th class="py-3">Gravité</th>
+        <th class="py-3">Service</th>
+        <th class="pe-4 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let incident of paginatedIncidents" class="incident-row">
+        <!-- Code avec ampoule clignotante -->
+        <td class="ps-4 fw-bold font-monospace">
+          {{ incident.code }}
+          <span *ngIf="isNewIncident(incident.id)" class="new-incident">
+            <i class="bi bi-lightbulb-fill"></i>
+          </span>
+        </td>
+
+        <td>{{ getDateFromCode(incident.code) }}</td>
+
+        <!-- Gravité -->
+        <td>
+          <div class="gravity-indicator" [style.background]="getGraviteGradient(incident.gravite)">
+            <div class="gravity-level" [style.width.%]="getGraviteLevel(incident.gravite)"></div>
+            <span>{{ getGraviteLabel(incident.gravite) }}</span>
+          </div>
+        </td>
+
+        <!-- Service -->
+        <td>
+          <span class="badge bg-primary">{{ getServiceName(incident) }}</span>
+        </td>
+
+        <!-- Actions -->
+        <td class="pe-4 d-flex gap-2">
+          <!-- Bouton Voir -->
+          <button class="btn btn-action" (click)="openIncident(incident, 'view')" title="Voir">
+            <i class="bi bi-eye"></i>
+          </button>
+
+          <!-- Bouton Modifier -->
+          <button class="btn btn-warning" (click)="openIncident(incident, 'edit')" title="Modifier">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <button class="btn btn-secondary" (click)="prevPage()" [disabled]="currentPage === 1">
+    Précédent
+  </button>
+
+  <div>
+    <button *ngFor="let page of pages"
+            class="btn"
+            [ngClass]="{'btn-primary': page === currentPage, 'btn-outline-primary': page !== currentPage}"
+            (click)="goToPage(page)">
+      {{ page }}
+    </button>
+  </div>
+
+  <button class="btn btn-secondary" (click)="nextPage()" [disabled]="currentPage === totalPages">
+    Suivant
+  </button>
+</div>

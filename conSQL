@@ -1,0 +1,1 @@
+sqlcmd -S "localhost,1433" -U SA -P '7devpro#' -d DEI -C -N

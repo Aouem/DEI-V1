@@ -1,0 +1,105 @@
+@model DEI.Models.AnalyseRisque
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Analyse des risques - Grille ALARM</h2>
+
+    <form asp-action="Creer" method="post" class="needs-validation" novalidate>
+        <input type="hidden" asp-for="EvenementIndesirableId" />
+
+        @for (int i = 0; i < Model.FacteursRisque.Count; i++)
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <span class="badge bg-primary">@Model.FacteursRisque[i].Categorie</span> - 
+                        @Model.FacteursRisque[i].SousCategorie
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    @Html.HiddenFor(m => m.FacteursRisque[i].Id)
+                    @Html.HiddenFor(m => m.FacteursRisque[i].Categorie)
+                    @Html.HiddenFor(m => m.FacteursRisque[i].SousCategorie)
+                    @Html.HiddenFor(m => m.FacteursRisque[i].Question)
+
+                    <div class="mb-3">
+                        <h6 class="card-subtitle mb-2 text-muted">Question :</h6>
+                        <p class="card-text font-weight-bold">@Model.FacteursRisque[i].Question</p>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.FacteursRisque[i].Exemples))
+                    {
+                        <div class="alert alert-info mb-3">
+                            <h6 class="alert-heading">Exemples :</h6>
+                            <p class="mb-0">@Model.FacteursRisque[i].Exemples</p>
+                        </div>
+                    }
+
+                    <div class="form-group mb-3">
+                        <label asp-for="FacteursRisque[i].Reponse" class="form-label">Votre réponse :</label>
+                        <textarea asp-for="FacteursRisque[i].Reponse" class="form-control" rows="3" 
+                                  placeholder="Décrivez comment ce facteur a influencé l'événement..." required></textarea>
+                        <div class="invalid-feedback">
+                            Veuillez fournir une réponse pour cette question.
+                        </div>
+                        <span asp-validation-for="FacteursRisque[i].Reponse" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FacteursRisque[i].Analyse" class="form-label">Analyse du risque :</label>
+                        <textarea asp-for="FacteursRisque[i].Analyse" class="form-control" rows="4"
+                                  placeholder="Analysez l'impact de ce facteur sur l'événement..."></textarea>
+                        <span asp-validation-for="FacteursRisque[i].Analyse" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card border-primary mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Conclusion générale</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label asp-for="Conclusion" class="form-label">Synthèse des principaux risques identifiés :</label>
+                    <textarea asp-for="Conclusion" class="form-control" rows="5" required></textarea>
+                    <div class="invalid-feedback">
+                        Veuillez fournir une conclusion générale.
+                    </div>
+                    <span asp-validation-for="Conclusion" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-5">
+            <a asp-action="Details" asp-controller="Evenements" 
+               asp-route-id="@Model.EvenementIndesirableId" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Enregistrer l'analyse
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}

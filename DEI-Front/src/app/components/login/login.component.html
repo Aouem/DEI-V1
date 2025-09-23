@@ -1,0 +1,42 @@
+<!-- login.component.html -->
+<div class="login-page">
+  <div class="login-card">
+    
+    <!-- Header -->
+    <div class="login-header mb-4">
+      <h2 class="fw-bold text-primary mb-2 text-center">Portail Sécurisé</h2>
+      <p class="text-muted small text-center">Déclaration des événements indésirables</p>
+    </div>
+
+    <!-- Formulaire -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <div *ngIf="errorMessage" class="alert alert-danger text-center mb-3">
+        {{ errorMessage }}
+      </div>
+
+      <div class="mb-4">
+        <label for="userName" class="form-label">Nom d'utilisateur</label>
+        <input type="text" id="userName" class="form-control input-field" formControlName="userName" placeholder="Entrez votre nom d'utilisateur">
+        <div *ngIf="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched" class="text-danger small mt-1">
+          Nom d'utilisateur est obligatoire
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="form-label">Mot de passe</label>
+        <input type="password" id="password" class="form-control input-field" formControlName="password" placeholder="Entrez votre mot de passe">
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-danger small mt-1">
+          Mot de passe est obligatoire
+        </div>
+      </div>
+
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-submit fw-bold" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Connexion en cours...' : 'Se connecter' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

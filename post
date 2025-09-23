@@ -1,0 +1,13 @@
+{
+  "evenement": {
+    "type": 0,
+    "description": "Exemple d'événement"
+  },
+  "gravite": 1,
+  "declarantId": "b37f3604-d420-4b09-b6bb-7dfa13deaf25",
+  "description": "Description complète de l'événement",
+  "localisation": "Site A",
+  "dateSurvenue": "2025-07-31T12:00:00",
+  "dateDetection": "2025-07-31T12:00:00",
+  "familleEvenementIndesirableId": 1
+}

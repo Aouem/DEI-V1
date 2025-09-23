@@ -1,0 +1,307 @@
+.dashboard {
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #e0f7fa, #ffffff); /* léger dégradé de fond */
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+  color: #2575fc;
+  font-weight: bold;
+  font-size: 2rem;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.logout-btn {
+  position: absolute;
+  right: 0;
+  background: linear-gradient(45deg, #f44336, #ff7961);
+  border: none;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  transform: scale(1.05) rotate(-2deg);
+  background: linear-gradient(45deg, #d32f2f, #ff5252);
+}
+
+/* === GRID POUR LES CARDS === */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  justify-items: center;
+}
+
+/* CARDS */
+.card {
+  background: rgba(255,255,255,0.95); /* effet semi-transparent */
+  backdrop-filter: blur(8px);         /* effet glass */
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 220px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+  text-align: center;
+  position: relative;
+  /* overflow: hidden; <-- supprimé pour que la lampe soit visible */
+}
+
+.card:hover {
+  transform: translateY(-10px) rotate(-1deg);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+  background: rgba(255,255,255,1);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.15), rgba(0,0,0,0.03));
+  top: -10%;
+  left: -10%;
+  transform: rotate(25deg);
+  transition: all 0.5s ease;
+}
+
+.card:hover::before {
+  transform: rotate(0deg);
+}
+
+/* ICONES */
+.card-icon {
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  transition: transform 0.3s;
+}
+
+.card:hover .card-icon {
+  transform: rotate(15deg) scale(1.2);
+}
+
+/* TEXTES */
+.card-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.card-content p {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Dégradés par type de card */
+.users-card { background: linear-gradient(135deg, #a8e6cf, #dcedc1); }
+.services-card { background: linear-gradient(135deg, #80d8ff, #40c4ff); }
+.questions-card { background: linear-gradient(135deg, #ffd180, #ffab40); }
+.submissions-card { background: linear-gradient(135deg, #e1bee7, #ba68c8); }
+.incident-card { background: linear-gradient(135deg, #ff8a80, #ff5252); }
+.incidents-list-card { background: linear-gradient(135deg, #ffcc80, #ffb74d); }
+
+/* === LAMPE CLIGNOTANTE === */
+.incidents-list-card {
+  position: relative;
+}
+
+.incidents-list-card span.big-blinking-lamp {
+  display: inline-block;
+  position: absolute;
+  top: -10px;   /* visible en haut */
+  right: -10px; /* légèrement à l’extérieur de la carte */
+  font-size: 2.5rem;
+  color: orange;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(1.3); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    width: 90%;
+  }
+}
+
+.dashboard-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(90deg, #ff6ec4, #7873f5, #42e695);
+  text-align: center;
+  padding: 15px 0;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.footer-text {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  display: inline-block;
+  animation: pulse 2s infinite;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 0 10px #fff, 0 0 20px #42e695;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* Bulles animées */
+.bubbles {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.bubbles span {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  animation: rise 6s infinite ease-in;
+}
+
+.bubbles span:nth-child(1) { left: 20%; animation-duration: 5s; width: 8px; height: 8px; }
+.bubbles span:nth-child(2) { left: 40%; animation-duration: 7s; width: 12px; height: 12px; }
+.bubbles span:nth-child(3) { left: 60%; animation-duration: 6s; width: 10px; height: 10px; }
+.bubbles span:nth-child(4) { left: 80%; animation-duration: 8s; width: 14px; height: 14px; }
+.bubbles span:nth-child(5) { left: 50%; animation-duration: 6s; width: 10px; height: 10px; }
+
+/* Animation des bulles */
+@keyframes rise {
+  0% { transform: translateY(0) scale(0.5); opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+}
+/* === CARD INCIDENTS AUJOURD'HUI === */
+.incidents-card {
+  background: linear-gradient(135deg, #ff8a80, #ff5252); /* rouge/orange */
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+  text-align: center;
+  position: relative;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Hover */
+.incidents-card:hover {
+  transform: translateY(-10px) rotate(-1deg);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, #ff5252, #ff1744);
+}
+
+/* Icone */
+.incidents-card .card-icon {
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  transition: transform 0.3s;
+}
+
+.incidents-card:hover .card-icon {
+  transform: rotate(15deg) scale(1.2);
+}
+
+/* Gravités */
+.incidents-card ul {
+  padding-left: 0;
+  list-style-type: none;
+  margin-top: 10px;
+}
+
+.incidents-card ul li {
+  margin: 3px 0;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Lampe clignotante si incidents > 0 */
+.incidents-card span.big-blinking-lamp {
+  display: inline-block;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 2.5rem;
+  color: orange;
+  animation: blink 1s infinite;
+}
+.incident-counter {
+  text-align: center;
+  margin: 20px auto;
+  padding: 20px;
+  width: 200px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.incident-number {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.incident-number.zero {
+  color: #4caf50; /* vert = aucun incident */
+}
+
+.incident-number.low {
+  color: #ffeb3b; /* jaune */
+}
+
+.incident-number.medium {
+  color: #ff9800; /* orange */
+}
+
+.incident-number.high {
+  color: #f44336; /* rouge */
+}

@@ -1,0 +1,596 @@
+/* Style général */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Titres */
+h1, h2, h3, h4, h5, h6 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+h1:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  border-radius: 2px;
+}
+
+h4 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+/* Cartes */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-bottom: none;
+  padding: 15px 20px;
+  position: relative;
+}
+
+.card-header:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+}
+
+.card-body {
+  padding: 25px;
+}
+
+/* Tableaux */
+.table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th, .table td {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+.table thead th {
+  background-color: #3498db;
+  color: white;
+  border-bottom: none;
+  font-weight: 500;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Formulaires */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 10px 15px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+/* Cases à cocher et boutons radio */
+.form-check-input {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.2rem;
+}
+
+.form-check-label {
+  margin-left: 5px;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  accent-color: #3498db;
+}
+
+/* Boutons */
+.btn {
+  border-radius: 6px;
+  padding: 10px 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3498db, #2ecc71);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  background: linear-gradient(135deg, #2980b9, #27ae60);
+}
+
+.btn-outline-secondary {
+  border: 1px solid #ced4da;
+  color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+/* Zone de texte */
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Effets spéciaux */
+.section-divider {
+  height: 3px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  margin: 30px 0;
+  border: none;
+}
+
+.required-field:after {
+  content: " *";
+  color: #e74c3c;
+}
+
+/* Animation pour les sections */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 15px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .d-flex {
+    flex-direction: column;
+  }
+}
+
+/* Style spécifique pour les cases à cocher dans les tableaux */
+.table input[type="checkbox"],
+.table input[type="radio"] {
+  margin-right: 8px;
+}
+
+.table input[type="text"].form-control-sm {
+  width: 70%;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+/* Gradient pour les en-têtes de section */
+.section-header {
+  background: linear-gradient(135deg, #3498db, #2ecc71);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0;
+}
+
+/* Style pour les champs date/time */
+input[type="date"], input[type="time"] {
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+/* Effet de focus amélioré */
+.form-control:focus,
+.form-check-input:focus,
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* Style pour les petits écrans */
+@media (max-width: 576px) {
+  .card-header {
+    padding: 10px 15px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h4 {
+    font-size: 1.2rem;
+  }
+}
+
+
+
+
+/* Alignement spécifique pour les champs de formulaire */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -10px;
+  margin-left: -10px;
+  align-items: center;
+}
+
+.form-group {
+  padding-right: 10px;
+  padding-left: 10px;
+  margin-bottom: 1rem;
+  flex: 1 0 0%;
+  min-width: 0;
+}
+
+/* Alignement spécifique pour les tableaux */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+/* Alignement des cases à cocher dans les tableaux */
+.table .form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.table .form-check-input {
+  margin-top: 0;
+  margin-right: 8px;
+}
+
+/* Alignement des champs "Autre" */
+.table input[type="text"].form-control-sm {
+  width: calc(100% - 30px);
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* Alignement uniforme pour tous les inputs */
+.form-control,
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="email"],
+input[type="tel"],
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Alignement spécifique pour les radios et checkboxes */
+.radio-group,
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.radio-group label,
+.checkbox-group label {
+  margin-bottom: 0;
+  margin-left: 0.5rem;
+}
+
+/* Alignement des boutons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Grille responsive pour les champs */
+@media (min-width: 768px) {
+  .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+
+  .col-md-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+}
+
+/* Correction spécifique pour les tableaux à deux colonnes */
+.two-column-table {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.two-column-table .table-cell {
+  flex: 0 0 50%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+}
+
+/* Alignement vertical pour les labels et champs */
+.form-label-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.form-label-container label {
+  margin-bottom: 0;
+  margin-right: 10px;
+  min-width: 120px;
+}
+
+/* Styles spécifiques pour les champs dans les tableaux */
+.table-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.table-input-container input[type="checkbox"],
+.table-input-container input[type="radio"] {
+  margin-right: 8px;
+}
+
+/* Ajustement pour les petits écrans */
+@media (max-width: 767px) {
+  .form-group {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .two-column-table .table-cell {
+    flex: 0 0 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Correction pour les champs inline */
+.inline-field-group {
+  display: flex;
+  align-items: center;
+}
+
+.inline-field-group .form-control {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.inline-field-group label {
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+/* Alignement parfait pour les champs date/heure */
+.date-time-group {
+  display: flex;
+  align-items: center;
+}
+
+.date-time-group .form-control {
+  flex: 1;
+  margin-right: 10px;
+}
+
+/* Style pour les champs obligatoires */
+.required-field::after {
+  content: " *";
+  color: #e74c3c;
+  margin-left: 2px;
+}
+
+
+.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+.btn.disabled {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+button {
+  position: relative;
+  padding: 8px 16px;
+  border: none;
+  background-color: #2e7d32;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.incident-form {
+  position: relative; /* nécessaire pour centrer le spinner */
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8); /* effet voile blanc */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+}
+
+/* Overlay semi-transparent sur tout le formulaire */
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+/* Spinner rond animé */
+.spinner-overlay {
+  position: fixed;          /* fixed pour couvrir tout l'écran */
+  top: 0;
+  left: 0;
+  width: 100vw;             /* toute la largeur de la fenêtre */
+  height: 100vh;            /* toute la hauteur de la fenêtre */
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;  /* centré horizontalement */
+  align-items: center;      /* centré verticalement */
+  z-index: 1000;            /* au-dessus de tout */
+}
+
+.spinner {
+  border: 12px solid #e0e0e0;
+  border-top: 12px solid #28a745;
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.prefilled {
+  font-weight: bold;           
+  background-color: #fff7c0;   
+  border: 1px solid #f0e68c;   
+  color: #333;                 
+}
+
+.prefilled-checkbox {
+  background-color: #d1e7dd; /* fond vert clair */
+  border-radius: 4px;
+  display: inline-block;
+  padding: 2px 4px;
+}
+
+.prefilled-checkbox label {
+  font-weight: bold;         /* texte du label en gras */
+  color: #0f5132;            /* texte vert foncé */
+}
