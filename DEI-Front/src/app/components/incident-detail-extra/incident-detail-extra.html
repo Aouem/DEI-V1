@@ -234,3 +234,80 @@
   </div>
 </div>
 
+<!-- 📈 Indicateur de croissance sur 5 ans -->
+<div class="mt-4 stats-section" *ngIf="croissanceParAn.length > 0">
+  <h3 class="stats-title">📈 Évolution des incidents par gravité sur 5 ans</h3>
+  
+  <!-- Tableau des données de croissance -->
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Année</th>
+          <th *ngFor="let gravite of sortedGraviteLabels">{{ gravite }}</th>
+          <th>Total</th>
+          <th>Croissance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let annee of croissanceParAn">
+          <td><strong>{{ annee.annee }}</strong></td>
+          <td *ngFor="let gravite of sortedGraviteLabels">
+            {{ annee.data[gravite] || 0 }}
+          </td>
+          <td><strong>{{ annee.total }}</strong></td>
+          <td [ngClass]="{
+            'text-success': annee.croissance > 0,
+            'text-danger': annee.croissance < 0,
+            'text-muted': annee.croissance === 0
+          }">
+            <span *ngIf="annee.croissance !== 0">
+              {{ annee.croissance > 0 ? '↗' : '↘' }}
+              {{ annee.croissance.toFixed(1) }}%
+            </span>
+            <span *ngIf="annee.croissance === 0">-</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Graphique d'évolution -->
+  <div class="chart-container mt-4" style="position: relative; height:500px; width:100%">
+    <canvas baseChart 
+            [data]="croissanceChartData" 
+            [options]="croissanceChartOptions" 
+            [type]="'line'">
+    </canvas>
+  </div>
+
+  <!-- Résumé des tendances -->
+  <div class="row mt-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Tendance générale</h5>
+          <p class="card-text">
+            <span *ngIf="getTendanceGenerale() > 0" class="text-success">
+              ↗ Augmentation de {{ getTendanceGenerale().toFixed(1) }}% sur 5 ans
+            </span>
+           <span *ngIf="getTendanceGenerale() < 0" class="text-danger">
+  ↘ Diminution de {{ getTendanceGeneraleAbsolue().toFixed(1) }}% sur 5 ans
+</span>
+            <span *ngIf="getTendanceGenerale() === 0" class="text-muted">
+              → Stabilité sur 5 ans
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Gravité la plus fréquente</h5>
+          <p class="card-text">{{ getGravitePlusFrequente() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

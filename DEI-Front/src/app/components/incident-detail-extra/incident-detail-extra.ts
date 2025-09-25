@@ -37,6 +37,11 @@ export class IncidentDetailExtraComponent implements OnInit {
   // Chart data
   matriceChartData: any;
 
+///indicateur 5 ans
+    public croissanceParAn: any[] = [];
+  public croissanceChartData!: ChartData<'line'>;
+  public croissanceChartOptions: ChartConfiguration['options'];
+
 
 
   incident: any;
@@ -155,6 +160,208 @@ filteredCount: number = 0;
     });
   }
 
+
+   private initCroissanceChartOptions() {
+    this.croissanceChartOptions = {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Évolution des incidents par gravité sur 5 ans'
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Nombre d\'incidents'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Année'
+          }
+        }
+      },
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false
+      }
+    };
+  }
+private calculateCroissanceParAn() {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
+  
+  // Ordre des gravités
+  const graviteOrder = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
+  
+  // Préparer les données par année et gravité
+  const dataByYear: { [year: number]: { [gravite: string]: number } } = {};
+  
+  years.forEach(year => {
+    dataByYear[year] = {};
+    graviteOrder.forEach(gravite => {
+      dataByYear[year][gravite] = 0;
+    });
+  });
+
+  // Compter les incidents par année et gravité
+  this.incidents.forEach(incident => {
+    if (incident.dateDeclaration) {
+      const incidentYear = new Date(incident.dateDeclaration).getFullYear();
+      if (years.includes(incidentYear)) {
+        const gravite = this.getGraviteLabel(incident.gravite);
+        dataByYear[incidentYear][gravite] = (dataByYear[incidentYear][gravite] || 0) + 1;
+      }
+    }
+  });
+// Calculer les totaux et pourcentages de croissance
+  this.croissanceParAn = years.map((year, index) => {
+    const yearData = dataByYear[year];
+    const total = Object.values(yearData).reduce((sum, count) => sum + count, 0);
+    
+    // Calculer la croissance par rapport à l'année précédente
+    let croissance = 0;
+    if (index > 0) {
+      const previousYear = years[index - 1];
+      const previousTotal = Object.values(dataByYear[previousYear]).reduce((sum, count) => sum + count, 0);
+      if (previousTotal > 0) {
+        croissance = ((total - previousTotal) / previousTotal) * 100;
+      }
+    }
+
+    return {
+      annee: year,
+      data: yearData,
+      total: total,
+      croissance: croissance
+    };
+  });
+
+  this.updateCroissanceChart();
+}
+
+private updateCroissanceChart() {
+  const graviteOrder = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
+  const colors = [
+    '#4BC0C0', // Bénin - Turquoise
+    '#FFCE56', // Peu grave - Jaune
+    '#FF9F40', // Moyenne - Orange
+    '#FF6384', // Grave - Rose
+    '#9966FF', // Très grave - Violet
+    '#36A2EB', // Catastrophique - Bleu
+    '#C9CBCF'  // N/A - Gris
+  ];
+
+  const datasets = graviteOrder.map((gravite, index) => {
+    return {
+      label: gravite,
+      data: this.croissanceParAn.map(yearData => yearData.data[gravite]),
+      borderColor: colors[index],
+      backgroundColor: colors[index] + '40', // Ajouter de la transparence
+      tension: 0.3,
+      fill: false
+    };
+  });
+
+  this.croissanceChartData = {
+    labels: this.croissanceParAn.map(y => y.annee.toString()),
+    datasets: datasets
+  };
+}
+private calculateCroissanceAvecFiltres() {
+  const filteredIncidents = this.getFilteredIncidents();
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
+  
+  const graviteOrder = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
+  const dataByYear: { [year: number]: { [gravite: string]: number } } = {};
+  
+  years.forEach(year => {
+    dataByYear[year] = {};
+    graviteOrder.forEach(gravite => {
+      dataByYear[year][gravite] = 0;
+    });
+  });
+
+  // Utiliser les incidents filtrés
+  filteredIncidents.forEach(incident => {
+    if (incident.dateDeclaration) {
+      const incidentYear = new Date(incident.dateDeclaration).getFullYear();
+      if (years.includes(incidentYear)) {
+        const gravite = this.getGraviteLabel(incident.gravite);
+        dataByYear[incidentYear][gravite] = (dataByYear[incidentYear][gravite] || 0) + 1;
+      }
+    }
+  });
+
+  this.croissanceParAn = years.map((year, index) => {
+    const yearData = dataByYear[year];
+    const total = Object.values(yearData).reduce((sum, count) => sum + count, 0);
+    
+    let croissance = 0;
+    if (index > 0) {
+      const previousYear = years[index - 1];
+      const previousTotal = Object.values(dataByYear[previousYear]).reduce((sum, count) => sum + count, 0);
+      if (previousTotal > 0) {
+        croissance = ((total - previousTotal) / previousTotal) * 100;
+      }
+    }
+
+    return {
+      annee: year,
+      data: yearData,
+      total: total,
+      croissance: croissance
+    };
+  });
+
+  this.updateCroissanceChart();
+}
+// Méthode pour calculer la tendance générale
+getTendanceGenerale(): number {
+  if (this.croissanceParAn.length < 2) return 0;
+  
+  const firstYear = this.croissanceParAn[0];
+  const lastYear = this.croissanceParAn[this.croissanceParAn.length - 1];
+  
+  if (firstYear.total === 0) return 0;
+  
+  return ((lastYear.total - firstYear.total) / firstYear.total) * 100;
+}
+
+// Méthode pour trouver la gravité la plus fréquente
+getGravitePlusFrequente(): string {
+  if (this.croissanceParAn.length === 0) return 'Aucune donnée';
+  
+  const totals: { [gravite: string]: number } = {};
+  
+  this.sortedGraviteLabels.forEach(gravite => {
+    totals[gravite] = this.croissanceParAn.reduce((sum, annee) => 
+      sum + (annee.data[gravite] || 0), 0);
+  });
+  
+  const maxGravite = Object.keys(totals).reduce((a, b) => 
+    totals[a] > totals[b] ? a : b
+  );
+  
+  return `${maxGravite} (${totals[maxGravite]} incidents)`;
+}
+
+
+
   private loadIncidentById(id: number) {
     this.incidentService.getIncidentById(id).subscribe({
       next: data => {
@@ -183,6 +390,8 @@ filteredCount: number = 0;
         this.updateStats();
         this.updateFamilleChart(this.incidents);
         this.updateFamilleCharts(this.incidents);
+              this.calculateCroissanceParAn(); // ← Ajouter cette ligne
+
         this.cdr.detectChanges();
       },
       error: err => {
@@ -208,6 +417,7 @@ filterByFamille() {
 
   // Mettre à jour toutes les statistiques avec les nouvelles données filtrées
   this.updateStats();
+  this.calculateCroissanceAvecFiltres(); // ← Ajouter cette ligne
 
   this.cdr.detectChanges();
 }
@@ -325,8 +535,13 @@ getPagedFamilleIncidents(): any[] {
   this.updateChartData();
   this.updateFamilleChart(filteredIncidents);
   this.updateFamilleCharts(filteredIncidents);
-}
+    this.calculateCroissanceAvecFiltres(); // ← Ajouter cette ligne
 
+}
+// Ajoutez cette méthode dans la classe IncidentDetailExtraComponent
+getTendanceGeneraleAbsolue(): number {
+  return Math.abs(this.getTendanceGenerale());
+}
 
   private updateChartData() {
     // Graphique pour les statuts
