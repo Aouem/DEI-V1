@@ -1168,6 +1168,9 @@ clearFilters() {
   this.filterByFamille(); // Cela va recalculer avec tous les incidents
 }
   
+
+
+
 }
 // Définir le type minimal pour un incident
 

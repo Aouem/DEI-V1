@@ -8,7 +8,7 @@
   <!-- ========================= -->
   <div *ngIf="startDate || endDate || selectedFamille" class="alert alert-info d-flex align-items-center justify-content-between mb-4 p-3 shadow rounded-3">
   <div class="d-flex align-items-center gap-2">
-  <label for="familleFilter" class="form-label fw-bold m-0">Famille:</label>
+  <label for="familleFilter" class="form-label fw-bold m-0">Famille :</label>
   <select id="familleFilter" class="form-select" [(ngModel)]="selectedFamille" (change)="filterByFamille()">
     <option value="">-- Toutes --</option>
     <option *ngFor="let f of getFamilles()" [value]="f">{{ f }}</option>

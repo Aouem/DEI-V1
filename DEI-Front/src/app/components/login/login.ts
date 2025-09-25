@@ -58,24 +58,21 @@ export class LoginComponent implements OnInit {
 
         // 🔹 Redirection selon rôle
         console.log('🔹 Rôle détecté:', user.role);
-        switch (user.role) {
-          case 'ADMIN':
-            console.log('➡️ Redirection vers /admin');
-            this.router.navigate(['/admin']);
-            break;
-          case 'VALIDATEUR':
-            console.log('➡️ Redirection vers /dashboard');
-            this.router.navigate(['/dashboard']); // tableau validateur
-            break;
-          case 'DECLARANT':
-            console.log('➡️ Redirection vers /incident-form');
-            this.router.navigate(['/incident-form']); // simple user
-            break;
-          default:
-            console.warn('⚠️ Rôle inconnu, redirection vers /unauthorized');
-            this.router.navigate(['/unauthorized']);
-            break;
-        }
+       switch (user.role) {
+  case 'ADMIN':
+    this.router.navigate(['/dashboard-admin']);
+    break;
+  case 'VALIDATEUR':
+    this.router.navigate(['/dashboard-validateur']);
+    break;
+  case 'DECLARANT':
+    this.router.navigate(['/dashboard-user']);
+    break;
+  default:
+    this.router.navigate(['/unauthorized']);
+    break;
+}
+
 
         this.isSubmitting = false;
       },

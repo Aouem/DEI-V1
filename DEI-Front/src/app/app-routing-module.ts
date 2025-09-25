@@ -9,6 +9,7 @@ import { IncidentDetailExtraComponent } from './components/incident-detail-extra
 import { AuthGuard } from './services/auth-guard';
 import { RoleGuard } from './services/RoleGuard';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
+import { DashbordDeclarantComponent } from './components/dashbord-declarant/dashbord-declarant';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -64,7 +65,9 @@ const routes: Routes = [
   },
 
   // Redirection par défaut
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: 'dashboard' },
+
+ { path: 'dashboard-user', component: DashbordDeclarantComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['DECLARANT'] } }
 ];
 
 @NgModule({

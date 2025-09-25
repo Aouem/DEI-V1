@@ -24,6 +24,7 @@ const routes: Routes = [
   { path: 'confirmation', component: ConfirmationComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
   { path: 'incidents-list', component: IncidentListComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
     { path: 'incident-form', component: IncidentFormComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
+{ path: 'incident-form/:id', component: IncidentFormComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
 
   { path: 'services', component: ServicesComponent, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },
   { path: 'utilisateurs', component: UserList, canActivate: [RoleGuard], data: { roles: ['ADMIN'] } },

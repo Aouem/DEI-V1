@@ -91,4 +91,11 @@ export class DashboardValidateurComponent implements OnInit {
     if (count <= 5) return 'medium';
     return 'high';
   }
+
+goBack(): void {
+  window.history.back();
+}
+
+
+
 }

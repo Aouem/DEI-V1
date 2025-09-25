@@ -22,6 +22,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { HomeButtonComponent } from './compoenets/home-button/home-button';
 import { IncidentDetailExtraComponent } from './components/incident-detail-extra/incident-detail-extra';
+import { DashbordDeclarantComponent } from './components/dashbord-declarant/dashbord-declarant';
 
 // Enregistrer le locale français
 registerLocaleData(localeFr);
@@ -41,7 +42,7 @@ registerLocaleData(localeFr);
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-
+DashbordDeclarantComponent,
     // Composants standalone
     EvenementDetailComponent,
     IncidentFormComponent,
