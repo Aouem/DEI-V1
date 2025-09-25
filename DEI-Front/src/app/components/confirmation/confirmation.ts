@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SubmissionService } from '../../services/submission-service';
+
 
 enum QuestionCategory {
   Patient = 'Patient',
@@ -23,24 +24,29 @@ enum ResponseType {
 }
 
 interface ReponseData {
+  id: number;
   questionId: number;
   reponse: string;
   texte?: string;
   categorie?: string;
   sousCategorie?: string;
   question?: string;
+  alarmResponseId?: number;
+  commentaire?: string;
+}
+
+interface SubmissionMetadata {
+  submissionDate?: string;
+  sessionId?: string;
+  incidentId?: number;
 }
 
 interface SubmissionData {
   id: number;
   createdAt: string;
   reponses: ReponseData[];
-  metadata?: {
-    submissionDate: string;
-    sessionId: string;
-        incidentId?: number; // ← ajouter ici
-
-  };
+  metadata?: SubmissionMetadata;
+  incidentId?: number;
 }
 
 interface QuestionData {
@@ -73,142 +79,154 @@ export class ConfirmationComponent implements OnInit {
   groupedResponses: { [key: string]: QuestionResponse[] } = {};
   hasData: boolean = false;
   private allQuestions: QuestionData[] = [];
-  incidentId!: number; // ← nouveau
+  incidentId: number = 0;
+  submission: SubmissionData | null = null;
+    preserveOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => 0;
 
 
-  // Ajout pour analyse
-  categoryRiskScores: { [category: string]: { total: number, yes: number, no: number, partial: number, riskLevel: string } } = {};
+  categoryRiskScores: { [key: string]: { total: number, yes: number, no: number, partial: number, riskLevel: string } } = {};
   questionsToInvestigate: QuestionResponse[] = [];
+  private allSubmissions: SubmissionData[] = [];
 
   constructor(
-  private route: ActivatedRoute,
-  private router: Router,
-  private submissionService: SubmissionService
+    private route: ActivatedRoute,
+    private router: Router,
+    private submissionService: SubmissionService
   ) {}
-ngOnInit(): void {
-  this.loadSubmissionData();
-}
 
-private loadSubmissionData(): void {
-  // Récupération ID depuis paramMap ou queryParams
-  const idParam = this.route.snapshot.paramMap.get('id');
-  const incidentIdParam = this.route.snapshot.queryParams['incidentId'];
+  ngOnInit(): void {
+    this.initializeComponent();
+  }
 
-  // Si ID présent dans paramMap
-  if (idParam) {
-    const id = parseInt(idParam, 10);
-    if (!isNaN(id)) {
-      this.fetchSubmission(id);
-      return;
+  private initializeComponent(): void {
+    const submissionId = this.extractSubmissionId();
+    this.incidentId = this.extractIncidentIdFromUrl();
+
+    if (submissionId) {
+      this.fetchSubmission(submissionId);
+    } else if (this.incidentId > 0) {
+      this.loadAllSubmissionsAndFilter();
+    } else {
+      this.handleNoData();
     }
   }
 
-  // Si ID présent dans queryParams
-  if (incidentIdParam) {
-    const incidentId = parseInt(incidentIdParam, 10);
-    if (!isNaN(incidentId)) {
-      this.fetchSubmission(incidentId);
-      return;
-    }
+  private loadAllSubmissionsAndFilter(): void {
+    this.submissionService.getSubmissionsByIncidentId(this.incidentId).subscribe({
+      next: (submissions) => {
+        if (submissions && submissions.length > 0) {
+          const latest = submissions[submissions.length - 1];
+          this.fetchSubmission(latest.id);
+        } else {
+          this.handleNoData();
+        }
+      },
+      error: () => this.handleNoData()
+    });
   }
 
-  // Fallback: état de navigation
-  const navigation = this.router.getCurrentNavigation();
-  const submissionFromState = navigation?.extras?.state?.['submissionData'];
-  if (submissionFromState) {
-    console.log('Chargement depuis state navigation');
-    this.initializeData(submissionFromState);
-    return;
+  private fetchSubmission(submissionId: number): void {
+    this.submissionService.getSubmissionById(submissionId).subscribe({
+      next: (submission) => {
+        this.determineFinalIncidentId(submission);
+        this.initializeData(submission);
+      },
+      error: () => this.handleNoData()
+    });
   }
 
-  // Si aucune donnée trouvée
-  console.error('Aucune donnée de soumission disponible');
-  this.router.navigate(['/admin']);
-}
-
-// Méthode pour récupérer la soumission via le service
-private fetchSubmission(submissionId: number): void {
-  this.submissionService.getSubmissionById(submissionId).subscribe({
-    next: (submission: SubmissionData) => this.initializeData(submission),
-    error: (err) => {
-      console.error('Erreur lors de la récupération de la soumission', err);
-      this.router.navigate(['/admin']);
-    }
-  });
-}
-
-// Initialisation des données
-private initializeData(submissionData: SubmissionData): void {
-  this.submissionId = submissionData.id;
-  this.submissionDate = new Date(submissionData.createdAt);
-  this.incidentId = submissionData.metadata?.incidentId ?? 0;
-  this.hasData = true;
-
-  this.allQuestions = this.getAllQuestions();
-
-  this.responses = submissionData.reponses.map(res => {
-    const question = this.allQuestions.find(q => q.id === res.questionId);
-    return {
-      id: res.questionId,
-      question: question?.text || `Question ${res.questionId}`,
-      response: res.reponse,
-      category: question?.category || QuestionCategory.Other,
-      subCategory: question?.subCategory || 'Non classée',
-      details: res.texte
-    };
-  });
-
-  this.groupResponsesByCategory();
-
-  // Analyse des risques
-  this.categoryRiskScores = this.getCategoryRiskScores();
-  this.questionsToInvestigate = this.getQuestionsToInvestigate();
-}
-
-
-  getCategoryDisplayName(category: string): string {
-    return category;
+  private determineFinalIncidentId(submission: SubmissionData): void {
+    if (this.incidentId > 0) return;
+    this.incidentId = submission.metadata?.incidentId || submission.incidentId || 0;
   }
 
-  getSubCategories(responses: QuestionResponse[]): {name: string, responses: QuestionResponse[]}[] {
-    const subCategories = new Map<string, QuestionResponse[]>();
+  private extractIncidentIdFromUrl(): number {
+    const currentUrl = window.location.href;
+    const match = currentUrl.match(/\/evenement\/(\d+)/);
+    if (match) return parseInt(match[1], 10) || 0;
+    const param = new URLSearchParams(window.location.search).get('incidentId');
+    if (param) return parseInt(param, 10) || 0;
+    const routeParam = this.route.snapshot.paramMap.get('incidentId');
+    if (routeParam) return parseInt(routeParam, 10) || 0;
+    return 0;
+  }
 
-    responses.forEach(response => {
-      if (!subCategories.has(response.subCategory)) {
-        subCategories.set(response.subCategory, []);
-      }
-      subCategories.get(response.subCategory)?.push(response);
+  private extractSubmissionId(): number | null {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) return parseInt(idParam, 10) || null;
+    const urlMatch = window.location.href.match(/\/confirmation\/(\d+)/);
+    if (urlMatch) return parseInt(urlMatch[1], 10) || null;
+    return null;
+  }
+
+  private handleNoData(): void {
+    this.hasData = false;
+  }
+
+  private initializeData(submissionData: SubmissionData): void {
+    this.submissionId = submissionData.id || 0;
+    this.submissionDate = new Date(submissionData.createdAt);
+    this.submission = submissionData;
+
+    this.hasData = true;
+    this.allQuestions = this.getAllQuestions();
+
+    this.responses = (submissionData.reponses || []).map(res => {
+      const question = this.allQuestions.find(q => q.id === res.questionId);
+      return {
+        id: res.questionId,
+        question: question?.text || `Question ${res.questionId}`,
+        response: res.reponse,
+        category: this.mapToQuestionCategory(res.categorie || ''),
+        subCategory: res.sousCategorie || 'Non classée',
+        details: res.texte || res.commentaire
+      };
     });
 
-    return Array.from(subCategories.entries()).map(([name, responses]) => ({
-      name,
-      responses: responses.sort((a, b) => a.id - b.id)
-    }));
+    this.groupResponsesByCategory();
+    this.categoryRiskScores = this.getCategoryRiskScores();
+    this.questionsToInvestigate = this.getQuestionsToInvestigate();
   }
 
-  getQuestionNumber(questionId: number): string {
-    const question = this.allQuestions.find(q => q.id === questionId);
-    if (question) {
-      return `${Math.floor(question.id / 100)}.${question.id % 100}`;
-    }
-    return '?';
+  private mapToQuestionCategory(categorie: string): QuestionCategory {
+    const map: { [key: string]: QuestionCategory } = {
+      'Patient': QuestionCategory.Patient,
+      'Tâches': QuestionCategory.Tasks,
+      'Individu': QuestionCategory.Individual,
+      'Équipe': QuestionCategory.Team,
+      'Environnement': QuestionCategory.Environment,
+      'Organisation': QuestionCategory.Organization,
+      'Contexte': QuestionCategory.Context
+    };
+    return map[categorie] || QuestionCategory.Other;
   }
 
-  getResponseDisplay(response: string): string {
-    if (!response) return ResponseType.UNKNOWN;
+  private groupResponsesByCategory(): void {
+    this.groupedResponses = this.responses.reduce((acc, response) => {
+      const key = response.category.toString();
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(response);
+      return acc;
+    }, {} as Record<string, QuestionResponse[]>);
+    this.sortGroupedResponses();
+  }
 
-    const lowerResponse = response.toLowerCase();
-    if (lowerResponse.includes('oui') || lowerResponse === 'o') return ResponseType.YES;
-    if (lowerResponse.includes('non') || lowerResponse === 'n') return ResponseType.NO;
-    if (lowerResponse.includes('partiel')) return ResponseType.PARTIAL;
-    if (lowerResponse.includes('applicable') || lowerResponse === 'na') return ResponseType.NA;
+  private sortGroupedResponses(): void {
+    const ordered = Object.values(QuestionCategory);
+    this.groupedResponses = Object.keys(this.groupedResponses)
+      .sort((a, b) => ordered.indexOf(this.parseQuestionCategory(a)) - ordered.indexOf(this.parseQuestionCategory(b)))
+      .reduce((acc, key) => {
+        acc[key] = this.groupedResponses[key].sort((a, b) => a.id - b.id);
+        return acc;
+      }, {} as Record<string, QuestionResponse[]>);
+  }
 
-    return response;
+  private parseQuestionCategory(category: string): QuestionCategory {
+    return Object.values(QuestionCategory).find(c => c === category) || QuestionCategory.Other;
   }
 
   getResponseClass(response: string): string {
     const display = this.getResponseDisplay(response);
-
     switch (display) {
       case ResponseType.YES: return 'response-yes';
       case ResponseType.NO: return 'response-no';
@@ -219,24 +237,8 @@ private initializeData(submissionData: SubmissionData): void {
     }
   }
 
-  getCategoryStats(responses: QuestionResponse[]): string {
-    const total = responses.length;
-    const yes = responses.filter(r => this.getResponseDisplay(r.response) === ResponseType.YES).length;
-    const no = responses.filter(r => this.getResponseDisplay(r.response) === ResponseType.NO).length;
-
-    return `${yes} ✓ / ${no} ✗ / ${total} total`;
-  }
-
-  getSubCategoryStats(responses: QuestionResponse[]): string {
-    const yes = responses.filter(r => this.getResponseDisplay(r.response) === ResponseType.YES).length;
-    return `${yes}/${responses.length} positifs`;
-  }
-
-
-
-
   private getAllQuestions(): QuestionData[] {
-        return [
+    return [
       // 1. Facteurs liés au patient
       {
         id: 101,
@@ -474,82 +476,44 @@ private initializeData(submissionData: SubmissionData): void {
     ];
   }
 
-  private groupResponsesByCategory(): void {
-    this.groupedResponses = this.responses.reduce((acc, response) => {
-      const categoryKey = response.category.toString();
-      if (!acc[categoryKey]) {
-        acc[categoryKey] = [];
-      }
-      acc[categoryKey].push(response);
-      return acc;
-    }, {} as Record<string, QuestionResponse[]>);
+     printPage(): void { window.print(); }
 
-    this.sortGroupedResponses();
-  }
+  goToAllSubmissions(): void { this.router.navigate(['/admin/all-submissions']); }
 
-  private sortGroupedResponses(): void {
-    const orderedCategories = Object.values(QuestionCategory);
-    this.groupedResponses = Object.keys(this.groupedResponses)
-      .sort((a, b) => {
-        const catA = this.parseQuestionCategory(a);
-        const catB = this.parseQuestionCategory(b);
-        return orderedCategories.indexOf(catA) - orderedCategories.indexOf(catB);
-      })
-      .reduce((acc, key) => {
-        acc[key] = this.groupedResponses[key].sort((a, b) => a.id - b.id);
-        return acc;
-      }, {} as Record<string, QuestionResponse[]>);
-  }
-
-  private parseQuestionCategory(category: string): QuestionCategory {
-    const validCategory = Object.values(QuestionCategory)
-      .find(c => c.toString() === category) as QuestionCategory;
-    return validCategory || QuestionCategory.Other;
-  }
-
-  getSubcategory(questionId: number): string {
-    const question = this.allQuestions.find(q => q.id === questionId);
-    if (question) {
-      return `${Math.floor(question.id / 100)}.${question.id % 100}`;
-    }
-    return 'Non classée';
-  }
-
-  printPage(): void {
-    window.print();
-  }
-
-  goToAllSubmissions() {
-    this.router.navigate(['/admin/all-submissions']);
-  }
-
-  // Méthode analyse des risques par catégorie
-  getCategoryRiskScores(): { [category: string]: { total: number, yes: number, no: number, partial: number, riskLevel: string } } {
-    const scores: { [category: string]: { total: number, yes: number, no: number, partial: number, riskLevel: string } } = {};
-
+  getCategoryRiskScores(): { [key: string]: { total: number, yes: number, no: number, partial: number, riskLevel: string } } {
+    const scores: { [key: string]: { total: number, yes: number, no: number, partial: number, riskLevel: string } } = {};
     Object.entries(this.groupedResponses).forEach(([category, responses]) => {
       const total = responses.length;
       const yes = responses.filter(r => this.getResponseDisplay(r.response) === ResponseType.YES).length;
       const no = responses.filter(r => this.getResponseDisplay(r.response) === ResponseType.NO).length;
       const partial = responses.filter(r => this.getResponseDisplay(r.response) === ResponseType.PARTIAL).length;
-
       let riskLevel = 'Faible';
       const negativeRatio = (no + partial) / total;
-
       if (negativeRatio > 0.6) riskLevel = 'Élevé';
       else if (negativeRatio > 0.3) riskLevel = 'Moyen';
-
       scores[category] = { total, yes, no, partial, riskLevel };
     });
-
     return scores;
   }
 
-  // Questions à investiguer
   getQuestionsToInvestigate(): QuestionResponse[] {
     return this.responses.filter(r => {
       const display = this.getResponseDisplay(r.response);
       return display === ResponseType.NO || display === ResponseType.PARTIAL || display === ResponseType.UNKNOWN;
     });
   }
+
+  getResponseDisplay(response: string): string {
+    if (!response) return ResponseType.UNKNOWN;
+    const lower = response.toLowerCase();
+    if (lower.includes('oui') || lower === 'o') return ResponseType.YES;
+    if (lower.includes('non') || lower === 'n') return ResponseType.NO;
+    if (lower.includes('partiel')) return ResponseType.PARTIAL;
+    if (lower.includes('applicable') || lower === 'na') return ResponseType.NA;
+    return ResponseType.UNKNOWN;
+  }
+  alphabeticalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
+  return a.key.localeCompare(b.key);
+};
+
 }

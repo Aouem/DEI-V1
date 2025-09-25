@@ -1,22 +1,46 @@
-// interfaces/SubmissionData.ts
+export interface SubmissionMetadata {
+  submissionDate?: string;
+  sessionId?: string;
+  incidentId?: number;
+}
 
 export interface ReponseData {
+  id: number;
   questionId: number;
-  reponse: string;
+  categorie: string;        // ← ici c’est 'categorie'
+  sousCategorie: string;
+  question: string;
+  reponse: string;          // ← ici c’est 'reponse'
+  commentaire: string;
+  alarmResponseId: number;
+  alarmResponse?: any;
   texte?: string;
-  categorie?: string;
-  sousCategorie?: string;
-  question?: string;
 }
+
+export interface ReponseDataCreate {
+  questionId: number;
+  texte: string;
+  reponse: string;
+  categorie: string;
+  sousCategorie: string;
+  question: string;
+  alarmResponseId: number;
+  commentaire: string;
+}
+
+export interface SubmissionCreate {
+  incidentId: number;                  // obligatoire
+  reponses: ReponseDataCreate[];       // tableau de réponses
+}
+
+
 
 export interface SubmissionData {
   id: number;
-  createdAt: string;
   reponses: ReponseData[];
-  metadata?: {
-    submissionDate: string;
-    sessionId: string;
-    incidentId?: number;
-    userId?: string;  // Ajoutez cette ligne si nécessaire
-  };
+  createdAt: string;
+  incidentId: number;
+  metadata?: SubmissionMetadata;
 }
+
+

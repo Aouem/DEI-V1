@@ -12,6 +12,7 @@ namespace DEI.Models // Remplace par ton namespace réel, ex: Formulaire_d_inscr
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-
+  [Required]
+        public int IncidentId { get; set; }
     }
 }

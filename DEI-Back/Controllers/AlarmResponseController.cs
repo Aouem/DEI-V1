@@ -47,6 +47,9 @@ namespace DEI.Controllers
             if (newResponse == null || newResponse.Reponses == null)
                 return BadRequest("La réponse ou ses sous-réponses sont nulles.");
 
+            if (newResponse.IncidentId <= 0)
+                return BadRequest("IncidentId doit être renseigné et supérieur à 0.");
+
             newResponse.CreatedAt = DateTime.UtcNow;
 
             _context.AlarmResponses.Add(newResponse);
@@ -66,6 +69,19 @@ namespace DEI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // GET: api/AlarmResponse/by-incident/201
+        [HttpGet("by-incident/{incidentId}")]
+        public async Task<ActionResult<IEnumerable<AlarmResponse>>> GetByIncident(int incidentId)
+        {
+            var responses = await _context.AlarmResponses
+                .Include(ar => ar.Reponses)
+                .Where(ar => ar.IncidentId == incidentId)
+                .ToListAsync();
+
+            // Toujours retourner une liste (vide si aucune réponse)
+            return Ok(responses);
         }
     }
 }

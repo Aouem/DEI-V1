@@ -1,5 +1,8 @@
-namespace DEI.Models
-{
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace DEI.Models{
     public class AnalyseRisque
     {
         public int Id { get; set; }
@@ -15,5 +18,8 @@ namespace DEI.Models
         public DateTime DateCreation { get; set; } = DateTime.Now;
 
         public string Createur { get; set; } = string.Empty;
+
+         [Required]
+        public int IncidentId { get; set; }
     }
 }

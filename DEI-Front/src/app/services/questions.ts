@@ -1,9 +1,11 @@
+// src/app/services/questions.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
+// -------------------- TYPES --------------------
 export interface Question {
   id: number;
   text: string;
@@ -24,13 +26,14 @@ export interface Answer {
 export interface AnswersPayload {
   reponses: Answer[];
   metadata?: {
-    submissionDate?: string;
+    submissionDate?: string;  // optionnel côté frontend, sera généré si absent
+    sessionId?: string;       // optionnel côté frontend, sera généré si absent
+    incidentId?: number;
     userId?: string;
-    sessionId?: string;
-    incidentId?: number; // ← Cette ligne doit être présente
   };
 }
 
+// -------------------- SERVICE --------------------
 @Injectable({
   providedIn: 'root'
 })
@@ -38,6 +41,7 @@ export class QuestionsService {
   private readonly apiUrl = environment.apiUrl;
   private readonly questionsEndpoint = 'questions';
   private readonly answersEndpoint = 'api/AlarmResponse';
+
   private readonly httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -45,37 +49,33 @@ export class QuestionsService {
     })
   };
 
-  // ✅ Cache local des questions
   private cachedQuestions: Question[] = [];
 
   constructor(private http: HttpClient) { }
 
-  // ✅ Appelé pour charger les questions depuis le backend
+  // ---------- QUESTIONS ----------
   getQuestions(): Observable<Question[]> {
-    return this.http.get<string[]>(
-      `${this.apiUrl}/${this.questionsEndpoint}`,
-      this.httpOptions
-    ).pipe(
-      map((data: string[]) => {
-        const questions = data.map((text, index) => ({
-          id: index + 1,
-          text: text,
-          category: this.getCategoryFromText(text),
-          subCategory: this.getSubCategoryFromText(text)
-        }));
-        this.cachedQuestions = questions; // ✅ Stockage dans le cache
-        return questions;
-      }),
-      catchError(this.handleError)
-    );
+    return this.http.get<string[]>(`${this.apiUrl}/${this.questionsEndpoint}`, this.httpOptions)
+      .pipe(
+        map((data: string[]) => {
+          const questions = data.map((text, index) => ({
+            id: index + 1,
+            text,
+            category: this.getCategoryFromText(text),
+            subCategory: this.getSubCategoryFromText(text)
+          }));
+          this.cachedQuestions = questions;
+          return questions;
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  // ✅ Méthode accessible dans AllSubmissionsComponent
   getAllQuestions(): Question[] {
     return this.cachedQuestions;
   }
 
-  // Soumettre les réponses au backend
+  // ---------- SUBMIT ANSWERS ----------
   submitAnswers(payload: AnswersPayload): Observable<any> {
     const backendPayload = {
       reponses: payload.reponses.map(item => ({
@@ -88,22 +88,18 @@ export class QuestionsService {
       })),
       metadata: {
         ...payload.metadata,
-        submissionDate: new Date().toISOString(),
+        submissionDate: payload.metadata?.submissionDate || new Date().toISOString(),
         sessionId: payload.metadata?.sessionId || this.generateSessionId()
       }
     };
 
     console.log('Envoi des réponses:', backendPayload);
 
-    return this.http.post(
-      `${this.apiUrl}/${this.answersEndpoint}`,
-      backendPayload,
-      this.httpOptions
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.post(`${this.apiUrl}/${this.answersEndpoint}`, backendPayload, this.httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
+  // ---------- UTILITAIRES ----------
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Une erreur inconnue est survenue';
 

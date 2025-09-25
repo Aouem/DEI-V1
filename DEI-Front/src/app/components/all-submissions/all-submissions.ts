@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,8 @@ export class AllSubmissionsComponent implements OnInit {
   filteredSubmissions: SubmissionData[] = [];
   pagedSubmissions: SubmissionData[] = [];
   incidentFilter: number | null = null;
-  isFiltering: boolean = false;
+  isLoading = true;
+  hasError = false;
 
   pageSize = 10;
   currentPage = 1;
@@ -25,50 +26,135 @@ export class AllSubmissionsComponent implements OnInit {
   constructor(
     private submissionService: SubmissionService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // Récupérer incidentId depuis l'URL
-    this.route.queryParams.subscribe(params => {
-      const incidentParam = params['incidentId'];
-      this.incidentFilter = incidentParam ? +incidentParam : null;
-      this.loadSubmissions();
-    });
+    this.loadSubmissions();
   }
 
-  /** Chargement des submissions via backend */
   private loadSubmissions(): void {
+    this.isLoading = true;
+    this.hasError = false;
+
     this.submissionService.getAllSubmissions().subscribe({
       next: (subs: SubmissionData[]) => {
-        this.submissions = subs;
-
-        // Filtrage automatique par incidentId si défini
-        this.filteredSubmissions = this.incidentFilter != null
-          ? this.submissions.filter(sub => sub.metadata?.incidentId === this.incidentFilter)
-          : [...this.submissions];
-
+        // Correction: Utiliser incidentId au lieu de alarmResponseId
+        this.submissions = (subs || []).map(sub => ({
+          ...sub,
+          // Si incidentId est 0 mais qu'on a des alarmResponseId dans les réponses
+          incidentId: this.extractGrilleAlarmId(sub)
+        }));
+        
+        this.filteredSubmissions = [...this.submissions];
         this.currentPage = 1;
         this.updatePagedSubmissions();
-        console.log('Submissions chargées:', this.filteredSubmissions);
+        this.isLoading = false;
+        
+        this.cdr.detectChanges();
+        
+        console.log('Submissions avec incidentId corrigé:', this.submissions);
       },
       error: (err: any) => {
         console.error('Erreur API:', err);
         this.submissions = [];
         this.filteredSubmissions = [];
         this.pagedSubmissions = [];
+        this.isLoading = false;
+        this.hasError = true;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  /** Pagination */
+  /** Extrait le grilleAlarmId (alarmResponseId) pour l'utiliser comme incidentId */
+  private extractGrilleAlarmId(sub: SubmissionData): number {
+    // Si incidentId est déjà valide, on le garde
+    if (sub.incidentId && sub.incidentId > 0) {
+      return sub.incidentId;
+    }
+    
+    // Sinon, on prend le alarmResponseId de la première réponse
+    if (sub.reponses && sub.reponses.length > 0) {
+      const responseWithAlarmId = sub.reponses.find(r => 
+        r.alarmResponseId != null && r.alarmResponseId > 0
+      );
+      return responseWithAlarmId?.alarmResponseId || 0;
+    }
+    
+    return 0;
+  }
+
+  /** Retourne l'incidentId (qui contient maintenant grilleAlarmId) */
+getIncidentId(sub: SubmissionData): number | null {
+  // Priorité 1: metadata.incidentId
+  if (sub.metadata?.incidentId && sub.metadata.incidentId > 0) {
+    return sub.metadata.incidentId;
+  }
+  
+  // Priorité 2: incidentId direct
+  if (sub.incidentId && sub.incidentId > 0) {
+    return sub.incidentId;
+  }
+  
+  // Priorité 3: alarmResponseId des réponses
+  if (sub.reponses && sub.reponses.length > 0) {
+    const responseWithIncident = sub.reponses.find(r => 
+      r.alarmResponseId != null && r.alarmResponseId > 0
+    );
+    return responseWithIncident?.alarmResponseId || null;
+  }
+  
+  return null;
+}
+
+  /** Retourne tous les incidentIds uniques (grilleAlarmId) */
+  getUniqueIncidentIds(): number[] {
+    if (this.submissions.length === 0) return [];
+    
+    const incidentIds = new Set<number>();
+    this.submissions.forEach(sub => {
+      if (sub.incidentId && sub.incidentId > 0) {
+        incidentIds.add(sub.incidentId);
+      }
+    });
+    
+    return Array.from(incidentIds).sort((a, b) => a - b);
+  }
+
+  /** Applique le filtre par incidentId (grilleAlarmId) */
+  applyFilters(): void {
+    console.log('Filtrage demandé avec incidentId:', this.incidentFilter);
+    
+    if (this.incidentFilter === null || this.incidentFilter === 0) {
+      this.filteredSubmissions = [...this.submissions];
+    } else {
+      // Maintenant on filtre directement par incidentId
+      this.filteredSubmissions = this.submissions.filter(sub =>
+        sub.incidentId === this.incidentFilter
+      );
+    }
+    
+    this.currentPage = 1;
+    this.updatePagedSubmissions();
+    
+    console.log('Résultat du filtrage:', {
+      incidentFilter: this.incidentFilter,
+      total: this.submissions.length,
+      filtered: this.filteredSubmissions.length
+    });
+  }
+
+  /** Met à jour les soumissions affichées sur la page courante */
   private updatePagedSubmissions(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.pagedSubmissions = this.filteredSubmissions.slice(startIndex, startIndex + this.pageSize);
   }
 
+  /** Pagination */
   totalPages(): number {
-    return Math.ceil(this.filteredSubmissions.length / this.pageSize);
+    return Math.max(Math.ceil(this.filteredSubmissions.length / this.pageSize), 1);
   }
 
   goToPage(page: number): void {
@@ -78,41 +164,39 @@ export class AllSubmissionsComponent implements OnInit {
   }
 
   nextPage(): void {
-    this.goToPage(this.currentPage + 1);
+    if (this.currentPage < this.totalPages()) {
+      this.currentPage++;
+      this.updatePagedSubmissions();
+    }
   }
 
   prevPage(): void {
-    this.goToPage(this.currentPage - 1);
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagedSubmissions();
+    }
   }
 
-  /** Filtrage manuel */
-  applyFilters(): void {
-  if (this.incidentFilter != null) {
-    this.filteredSubmissions = this.submissions.filter(
-      sub => sub.metadata?.incidentId === this.incidentFilter
-    );
-  } else {
+  /** Réinitialise le filtre */
+  clearFilter(): void {
+    this.incidentFilter = null;
     this.filteredSubmissions = [...this.submissions];
+    this.currentPage = 1;
+    this.updatePagedSubmissions();
   }
 
-  // Mettre à jour le flag isFiltering
-  this.isFiltering = this.incidentFilter != null && this.filteredSubmissions.length === 0;
-
-  this.currentPage = 1;
-  this.updatePagedSubmissions();
-}
-
-clearFilter(): void {
-  this.incidentFilter = null;
-  this.filteredSubmissions = [...this.submissions];
-  this.isFiltering = false; // Reset flag
-  this.currentPage = 1;
-  this.updatePagedSubmissions();
-}
-
-
-  /** Navigation vers la page de confirmation */
+  /** Navigation vers la page de détail */
   viewSubmission(id: number): void {
-    this.router.navigate(['/admin/confirmation', id], { state: { submissionId: id } });
+    this.router.navigate(['/admin/confirmation', id]);
+  }
+
+  /** TrackBy function pour l'optimisation */
+  trackBySubmissionId(index: number, submission: SubmissionData): number {
+    return submission.id;
+  }
+
+  /** Recharger les données */
+  reloadData(): void {
+    this.loadSubmissions();
   }
 }

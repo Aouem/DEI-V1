@@ -6,19 +6,13 @@ export interface Answer {
   sousCategorie?: string;
   question?: string;
 }
+
 export interface AnswersPayload {
-  reponses: {
-    questionId: number;
-    texte: string;
-    reponse: string;
-    categorie?: string;
-    sousCategorie?: string;
-    question?: string;
-  }[];
+  reponses: Answer[];
   metadata: {
-    submissionDate: string; // Doit être requis
-    sessionId: string;      // Doit être requis
-    incidentId?: number;
-    userId?: string;
+    submissionDate: string; // requis
+    sessionId: string;      // requis
+    incidentId?: number;    // optionnel
+    userId?: string;        // optionnel
   };
 }

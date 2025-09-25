@@ -10,6 +10,9 @@ namespace DEI.Models // Remplace par ton namespace réel, ex: Formulaire_d_inscr
     {
         public string? CreatedBy { get; set; }
         public List<AlarmQuestionResponseDto> Reponses { get; set; } = new();
+
+                public int IncidentId { get; set; }
+
     }
 
 

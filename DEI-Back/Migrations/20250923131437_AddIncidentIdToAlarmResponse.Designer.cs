@@ -4,6 +4,7 @@ using DEI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DEI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250923131437_AddIncidentIdToAlarmResponse")]
+    partial class AddIncidentIdToAlarmResponse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,9 +114,6 @@ namespace DEI.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("IncidentId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -706,7 +706,7 @@ namespace DEI.Migrations
                             Id = "1",
                             Email = "admin@example.com",
                             Fonction = "Administrateur",
-                            Password = "AQAAAAIAAYagAAAAEBAwJwcd5xqsK7dVGpQAyFAK5lfLiaDpOdSqGRN59PFsfleDHwOHx12/t1ggOwoHbA==",
+                            Password = "AQAAAAIAAYagAAAAEIh4gDeMr9eBHXql/oikvxG8her/eZHOMr51Urg/wkUaJEeGWwdn+dgoe0TxYHIU8A==",
                             Role = "ADMIN",
                             ServiceId = 1,
                             Tel = "12345678",

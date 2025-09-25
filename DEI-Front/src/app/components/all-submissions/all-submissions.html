@@ -1,8 +1,17 @@
 <div class="submissions-container">
   <h1>Historique des soumissions</h1>
 
+  <!-- Debug: État du composant -->
+  <div class="debug-info" style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
+    <strong>Debug:</strong> 
+    isLoading: {{isLoading}}, 
+    hasError: {{hasError}}, 
+    submissions: {{submissions.length}},
+    filteredSubmissions: {{filteredSubmissions.length}}
+  </div>
+
   <!-- Filtre par Incident ID -->
-  <div class="filter-container">
+  <div class="filter-container" *ngIf="!isLoading && !hasError">
     <label for="incidentFilter">Filtrer par Incident ID:</label>
     <input 
       type="number" 
@@ -13,51 +22,80 @@
       min="1"
     >
     <button (click)="clearFilter()" class="clear-filter-btn">×</button>
+    
+    <!-- Aide sur les IDs disponibles -->
+    <div class="help-text" *ngIf="submissions.length > 0">
+      IDs disponibles: {{ getUniqueIncidentIds().join(', ') }}
+    </div>
   </div>
 
-  <div *ngIf="filteredSubmissions.length > 0; else noSubmissions">
+  <!-- Message de chargement -->
+  <div *ngIf="isLoading" class="loading-message">
+    <div>Chargement des soumissions...</div>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="hasError && !isLoading" class="error-message">
+    <p>Erreur lors du chargement des soumissions.</p>
+    <button (click)="reloadData()" class="reload-btn">Réessayer le chargement</button>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!isLoading && !hasError && submissions.length > 0">
+    <!-- Statistiques -->
+    <div class="stats">
+      <strong>Total:</strong> {{submissions.length}} soumissions | 
+      <strong>Affichées:</strong> {{filteredSubmissions.length}} |
+      <strong>Page:</strong> {{currentPage}}/{{totalPages()}}
+    </div>
+
+    <!-- Tableau des soumissions -->
     <table class="submissions-table">
       <thead>
-       <tr>
-                  <th>ID Grille</th>
-                  <th>Date</th>
-                  <th>Réponses</th>
-                  <th>Actions</th>
-                </tr>
+        <tr>
+          <th>ID Grille</th>
+          <th>Date</th>
+          <th>Réponses</th>
+          <th>Incident ID</th>
+          <th>Actions</th>
+        </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let sub of pagedSubmissions">
+        <tr *ngFor="let sub of pagedSubmissions; trackBy: trackBySubmissionId">
           <td>{{ sub.id }}</td>
           <td>{{ sub.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ sub.reponses.length }}</td>
-          <td>{{ sub.metadata?.incidentId || 'N/A' }}</td>
-          <td class="actions-cell">
+          <td>{{ sub.reponses.length || 0 }}</td>
+          <td>
+            <span *ngIf="getIncidentId(sub); else noIncident" class="incident-id">
+              {{ getIncidentId(sub) }}
+            </span>
+            <ng-template #noIncident>
+              <span class="no-incident">-</span>
+            </ng-template>
+          </td>
+          <td>
             <button class="view-btn" (click)="viewSubmission(sub.id)">Voir</button>
-          
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div class="pagination-controls">
-      <button (click)="prevPage()" [disabled]="currentPage === 1">Précédent</button>
-
-      <button *ngFor="let p of [].constructor(totalPages()); let i = index"
-              (click)="goToPage(i + 1)"
-              [class.active]="currentPage === (i + 1)">
-        {{ i + 1 }}
-      </button>
-
-      <button (click)="nextPage()" [disabled]="currentPage === totalPages()">Suivant</button>
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages() > 1">
+      <button (click)="prevPage()" [disabled]="currentPage === 1">‹ Précédent</button>
+      <span class="page-info">Page {{currentPage}} sur {{totalPages()}}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages()">Suivant ›</button>
     </div>
   </div>
 
-  <ng-template #noSubmissions>
-    <p class="no-submissions-message" *ngIf="!isFiltering">
-      Aucune soumission enregistrée
-    </p>
-    <p class="no-results-message" *ngIf="isFiltering">
-      Aucune soumission trouvée pour l'incident ID: {{ incidentFilter }}
-    </p>
-  </ng-template>
+  <!-- Aucune soumission -->
+  <div *ngIf="!isLoading && !hasError && submissions.length === 0" class="no-submissions">
+    Aucune soumission enregistrée.
+  </div>
+
+  <!-- Aucun résultat après filtrage -->
+  <div *ngIf="!isLoading && !hasError && submissions.length > 0 && filteredSubmissions.length === 0" class="no-results">
+    <p>Aucune soumission trouvée pour l'Incident ID: <strong>{{ incidentFilter }}</strong></p>
+    <p>IDs disponibles: {{ getUniqueIncidentIds().join(', ') }}</p>
+  </div>
 </div>
