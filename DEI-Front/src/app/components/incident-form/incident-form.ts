@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { EvenementCreateDto } from '../../../interfaces/EvenementCreateDto';
+import { Location } from '@angular/common';
 
 interface FormValidationError {
   field: string;
@@ -37,7 +38,8 @@ export class IncidentFormComponent implements OnInit {
     private incidentService: IncidentService,
     private router: Router,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+      private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -491,7 +493,7 @@ this.actionsCorrectives.valueChanges.subscribe(() => {
        if (result?.id) {
     window.dispatchEvent(new CustomEvent('newIncidentCreated', { detail: result.id }));
   }
-      setTimeout(() => this.router.navigate(['/login']), 2000);
+    setTimeout(() => this.location.back(), 2000);
     } catch (error: any) {
       console.error('Erreur détaillée:', error);
       if (error.error) {
@@ -503,9 +505,9 @@ this.actionsCorrectives.valueChanges.subscribe(() => {
     }
   }
 
-  navigateToList(): void { 
-    this.router.navigate(['/login']); 
-  }
+  navigateToList(): void {
+  this.location.back();  // ✅ 
+}
 
   private prepareFormData(): EvenementCreateDto {
     const formValues = this.incidentForm.getRawValue();
