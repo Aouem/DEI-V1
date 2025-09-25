@@ -30,6 +30,8 @@ export class IncidentDetailExtraComponent implements OnInit {
   incidents: any[] = [];
     familles: string[] = []; 
 
+     isChartLoading = true;
+  chartError = '';
   
   // Statistiques
   matriceCount: any = {};
@@ -139,13 +141,15 @@ filteredCount: number = 0;
       }
     }
   };
+  currentYear: number;
 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private incidentService: IncidentService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { this.currentYear = new Date().getFullYear();
+    this.initCroissanceChartOptions();}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -162,52 +166,60 @@ filteredCount: number = 0;
 
 
    private initCroissanceChartOptions() {
-    this.croissanceChartOptions = {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-        },
-        title: {
-          display: true,
-          text: 'Évolution des incidents par gravité sur 5 ans'
-        },
-        tooltip: {
-          mode: 'index',
-          intersect: false
-        }
+  this.croissanceChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Nombre d\'incidents'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Année'
-          }
-        }
+      title: {
+        display: true,
+        text: 'Évolution des incidents par gravité sur 5 ans'
       },
-      interaction: {
-        mode: 'nearest',
-        axis: 'x',
+      tooltip: {
+        mode: 'index',
         intersect: false
       }
-    };
-  }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Nombre d\'incidents'
+        },
+        ticks: {
+          stepSize: 1
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Année'
+        }
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
+    }
+  };
+}
 private calculateCroissanceParAn() {
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
+  console.log('=== DEBUG calculateCroissanceParAn ===');
   
-  // Ordre des gravités
+  // Définir une plage fixe qui inclut 2025
+  const startYear = 2021;
+  const endYear = 2025;
+  const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
+  
+  console.log('🔍 Plage d\'années analysée:', years);
+  console.log('🔍 Nombre total d\'incidents:', this.incidents.length);
+
   const graviteOrder = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
-  
-  // Préparer les données par année et gravité
   const dataByYear: { [year: number]: { [gravite: string]: number } } = {};
   
   years.forEach(year => {
@@ -217,22 +229,40 @@ private calculateCroissanceParAn() {
     });
   });
 
-  // Compter les incidents par année et gravité
-  this.incidents.forEach(incident => {
+  // Compter les incidents avec debug détaillé
+  let totalComptes = 0;
+  
+  this.incidents.forEach((incident, index) => {
     if (incident.dateDeclaration) {
-      const incidentYear = new Date(incident.dateDeclaration).getFullYear();
-      if (years.includes(incidentYear)) {
-        const gravite = this.getGraviteLabel(incident.gravite);
-        dataByYear[incidentYear][gravite] = (dataByYear[incidentYear][gravite] || 0) + 1;
+      try {
+        const incidentDate = new Date(incident.dateDeclaration);
+        if (!isNaN(incidentDate.getTime())) {
+          const incidentYear = incidentDate.getFullYear();
+          const gravite = this.getGraviteLabel(incident.gravite);
+          
+          if (years.includes(incidentYear)) {
+            dataByYear[incidentYear][gravite] = (dataByYear[incidentYear][gravite] || 0) + 1;
+            totalComptes++;
+            
+            // Afficher les 5 premiers incidents pour debug
+            if (totalComptes <= 5) {
+              console.log(`✓ Incident ${index}: année ${incidentYear}, gravité ${gravite}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erreur avec l\'incident:', incident, error);
       }
     }
   });
-// Calculer les totaux et pourcentages de croissance
+
+  console.log(`📊 Incidents comptabilisés: ${totalComptes}`);
+
+  // Calculer les totaux et pourcentages de croissance
   this.croissanceParAn = years.map((year, index) => {
     const yearData = dataByYear[year];
     const total = Object.values(yearData).reduce((sum, count) => sum + count, 0);
     
-    // Calculer la croissance par rapport à l'année précédente
     let croissance = 0;
     if (index > 0) {
       const previousYear = years[index - 1];
@@ -242,6 +272,8 @@ private calculateCroissanceParAn() {
       }
     }
 
+    console.log(`📅 Année ${year}: total=${total}, croissance=${croissance}%`, yearData);
+
     return {
       annee: year,
       data: yearData,
@@ -250,27 +282,57 @@ private calculateCroissanceParAn() {
     };
   });
 
+  console.log('📈 Données finales:', this.croissanceParAn);
   this.updateCroissanceChart();
 }
 
+
 private updateCroissanceChart() {
+  console.log('=== DEBUG updateCroissanceChart ===');
+  
+  if (!this.croissanceParAn || this.croissanceParAn.length === 0) {
+    console.error('❌ Aucune donnée pour le graphique');
+    return;
+  }
+
   const graviteOrder = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
   const colors = [
-    '#4BC0C0', // Bénin - Turquoise
-    '#FFCE56', // Peu grave - Jaune
-    '#FF9F40', // Moyenne - Orange
-    '#FF6384', // Grave - Rose
-    '#9966FF', // Très grave - Violet
-    '#36A2EB', // Catastrophique - Bleu
-    '#C9CBCF'  // N/A - Gris
+    '#4BC0C0', '#FFCE56', '#FF9F40', '#FF6384', '#9966FF', '#36A2EB', '#C9CBCF'
   ];
 
+  // Vérifier qu'il y a des données à afficher
+const hasData = this.croissanceParAn.some(annee => 
+  Object.values(annee.data).some(count => typeof count === 'number' && count > 0)
+);
+
+
+  if (!hasData) {
+    console.warn('⚠️ Aucune donnée positive pour le graphique');
+    // Créer un graphique vide mais avec la structure correcte
+    this.croissanceChartData = {
+      labels: this.croissanceParAn.map(y => y.annee.toString()),
+      datasets: graviteOrder.map((gravite, index) => ({
+        label: gravite,
+        data: this.croissanceParAn.map(() => 0),
+        borderColor: colors[index],
+        backgroundColor: colors[index] + '40',
+        tension: 0.3,
+        fill: false
+      }))
+    };
+    return;
+  }
+  
+
   const datasets = graviteOrder.map((gravite, index) => {
+    const data = this.croissanceParAn.map(anneeData => anneeData.data[gravite] || 0);
+    console.log(`📊 Dataset ${gravite}:`, data);
+    
     return {
       label: gravite,
-      data: this.croissanceParAn.map(yearData => yearData.data[gravite]),
+      data: data,
       borderColor: colors[index],
-      backgroundColor: colors[index] + '40', // Ajouter de la transparence
+      backgroundColor: colors[index] + '40',
       tension: 0.3,
       fill: false
     };
@@ -280,7 +342,10 @@ private updateCroissanceChart() {
     labels: this.croissanceParAn.map(y => y.annee.toString()),
     datasets: datasets
   };
+
+  console.log('✅ Graphique mis à jour:', this.croissanceChartData);
 }
+
 private calculateCroissanceAvecFiltres() {
   const filteredIncidents = this.getFilteredIncidents();
   const currentYear = new Date().getFullYear();
@@ -344,23 +409,64 @@ getTendanceGenerale(): number {
 
 // Méthode pour trouver la gravité la plus fréquente
 getGravitePlusFrequente(): string {
-  if (this.croissanceParAn.length === 0) return 'Aucune donnée';
-  
-  const totals: { [gravite: string]: number } = {};
-  
-  this.sortedGraviteLabels.forEach(gravite => {
-    totals[gravite] = this.croissanceParAn.reduce((sum, annee) => 
-      sum + (annee.data[gravite] || 0), 0);
-  });
-  
-  const maxGravite = Object.keys(totals).reduce((a, b) => 
-    totals[a] > totals[b] ? a : b
-  );
-  
-  return `${maxGravite} (${totals[maxGravite]} incidents)`;
+  try {
+    if (!this.croissanceParAn || this.croissanceParAn.length === 0) {
+      return 'Aucune donnée disponible';
+    }
+    
+    // Créer un objet pour stocker les totaux
+    const totals: { [key: string]: number } = {};
+    
+    // Liste complète des gravités possibles
+    const allGravites = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
+    
+    // Initialiser tous les totaux à 0
+    allGravites.forEach(gravite => {
+      totals[gravite] = 0;
+    });
+    
+    // Calculer les totaux sur toutes les années
+    this.croissanceParAn.forEach(anneeData => {
+      allGravites.forEach(gravite => {
+        if (anneeData.data && anneeData.data[gravite]) {
+          totals[gravite] += anneeData.data[gravite];
+        }
+      });
+    });
+    
+    // Trouver la gravité avec le total maximum
+    let maxGravite = 'N/A';
+    let maxCount = 0;
+    
+    allGravites.forEach(gravite => {
+      if (totals[gravite] > maxCount) {
+        maxCount = totals[gravite];
+        maxGravite = gravite;
+      }
+    });
+    
+    if (maxCount === 0) {
+      return 'Aucun incident recensé sur la période';
+    }
+    
+    return `${maxGravite} (${maxCount} incident${maxCount > 1 ? 's' : ''})`;
+    
+  } catch (error) {
+    console.error('Erreur dans getGravitePlusFrequente:', error);
+    return 'Erreur de calcul';
+  }
 }
-
-
+// Méthode de debug temporaire
+debugCroissanceData() {
+  console.log('Données de croissance:', this.croissanceParAn);
+  console.log('Labels de gravité triés:', this.sortedGraviteLabels);
+  
+  if (this.croissanceParAn && this.croissanceParAn.length > 0) {
+    this.croissanceParAn.forEach(annee => {
+      console.log(`Année ${annee.annee}:`, annee.data);
+    });
+  }
+}
 
   private loadIncidentById(id: number) {
     this.incidentService.getIncidentById(id).subscribe({
@@ -530,6 +636,8 @@ getPagedFamilleIncidents(): any[] {
 
   this.totalFilteredIncidents = filteredIncidents.length;
   this.totalIncidents = filteredIncidents.length;
+
+  
 
   // Mise à jour des graphiques avec les données filtrées
   this.updateChartData();
