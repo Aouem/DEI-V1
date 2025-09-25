@@ -1,4 +1,3 @@
-<!-- src/app/components/dashbord-declarant/dashbord-declarant.html -->
 <div class="dashboard">
   <!-- Header -->
   <div class="dashboard-header">
@@ -8,20 +7,22 @@
 
   <!-- Cartes -->
   <div class="cards-container">
-    
+
     <!-- Carte incidents aujourd'hui -->
     <div class="card incidents-card">
       <div class="card-icon">⚠️</div>
       <div class="card-content">
-        <h3>Incidents aujourd'hui</h3>
+        <h3>Incidents d’aujourd’hui</h3>
         <div class="incident-number" [ngClass]="getIncidentClass(todayIncidentCount)">
-          {{ todayIncidentCount }}
+          Total : {{ todayIncidentCount }}
         </div>
+
         <ul *ngIf="todayIncidentCount > 0">
           <li *ngFor="let key of severityKeys()" [style.color]="getSeverityColor(key)">
-            Gravité {{ key }} : {{ severityCount[key] }}
+            Incidents gravité {{ key }} : {{ severityCount[key] }}
           </li>
         </ul>
+
         <span *ngIf="todayIncidentCount > 0" class="big-blinking-lamp">💡</span>
       </div>
     </div>

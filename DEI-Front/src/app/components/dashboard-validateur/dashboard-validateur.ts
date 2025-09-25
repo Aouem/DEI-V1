@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { IncidentService } from '../../services/incident';
@@ -23,7 +23,9 @@ export class DashboardValidateurComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private incidentService: IncidentService
+    private incidentService: IncidentService,
+      private cdr: ChangeDetectorRef  // <-- ajouter
+
   ) {}
 
   ngOnInit(): void {
@@ -43,20 +45,43 @@ export class DashboardValidateurComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // 🔹 Calcul des incidents d'aujourd'hui et de leurs gravités
+  navigateToIncidentForm(): void {
+    this.router.navigate(['/incident-form']);
+  }
+
+  // 🔹 Calcul des incidents d'aujourd'hui et de leurs gravités (heure locale)
   loadTodayIncidents(): void {
     this.incidentService.getIncidents().subscribe((incidents: Incident[]) => {
+      if (!incidents || incidents.length === 0) {
+        this.todayIncidentCount = 0;
+        this.severityCount = {};
+        return;
+      }
+
+      // Date du jour en local
       const today = new Date();
-      today.setHours(0,0,0,0);
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
 
       const todayIncidents = incidents.filter(i => {
-        const incidentDate = new Date(i.dateSurvenue);
-        incidentDate.setHours(0,0,0,0);
-        return incidentDate.getTime() === today.getTime();
+        if (!i.dateSurvenue) return false;
+
+        // Type-safe: convertir en Date uniquement si nécessaire
+        const incidentDate: Date = i.dateSurvenue instanceof Date
+          ? i.dateSurvenue
+          : new Date(i.dateSurvenue);
+
+        return (
+          incidentDate.getFullYear() === todayYear &&
+          incidentDate.getMonth() === todayMonth &&
+          incidentDate.getDate() === todayDay
+        );
       });
 
-      // Total d'incidents
       this.todayIncidentCount = todayIncidents.length;
+        this.cdr.detectChanges();
+
 
       // Comptage par gravité
       this.severityCount = {};
@@ -64,6 +89,10 @@ export class DashboardValidateurComponent implements OnInit {
         const g = i.gravite ?? 0;
         this.severityCount[g] = (this.severityCount[g] || 0) + 1;
       });
+
+      // 🔹 Logs pour vérification
+      console.log("Incidents d'aujourd'hui :", todayIncidents);
+      console.log('Comptage par gravité :', this.severityCount);
     });
   }
 
@@ -91,8 +120,4 @@ export class DashboardValidateurComponent implements OnInit {
     if (count <= 5) return 'medium';
     return 'high';
   }
-  navigateToIncidentForm(): void {
-  this.router.navigate(['/incident-form']);
-}
-
 }

@@ -305,3 +305,26 @@
 .incident-number.high {
   color: #f44336; /* rouge */
 }
+.severity-bars {
+  margin-top: 10px;
+}
+
+.severity-bar-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.severity-label {
+  width: 90px;
+  font-weight: bold;
+}
+
+.severity-bar {
+  height: 24px;
+  line-height: 24px;
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  margin-left: 5px;
+}
