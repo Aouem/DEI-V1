@@ -210,13 +210,15 @@ private processSubmissionData(submission: SubmissionData): void {
 
       this.responses = (submissionData.reponses || []).map(res => {
         const question = this.allQuestions.find(q => q.id === res.questionId);
+            const details = res.texte || res.commentaire || this.extractDetailsFromResponse(res.reponse) || '';
+
         return {
           id: res.questionId,
           question: question?.text || res.question || `Question ${res.questionId}`,
-          response: res.reponse,
+      response: this.getMainResponse(res.reponse), // Extraire juste "oui", "non", etc.
           category: this.mapToQuestionCategory(res.categorie || ''),
           subCategory: res.sousCategorie || 'Non classée',
-          details: res.texte || res.commentaire || ''
+      details: details
         };
       });
 
@@ -240,7 +242,49 @@ private processSubmissionData(submission: SubmissionData): void {
       this.hasData = false;
     }
   }
+// ✅ NOUVELLE méthode pour extraire les détails de la réponse
+private extractDetailsFromResponse(reponse: string): string {
+  if (!reponse) return '';
+  
+  // Séparer la réponse principale des détails (s'il y a un saut de ligne)
+  const parts = reponse.split('\n');
+  if (parts.length > 1) {
+    // Retourner tout sauf la première ligne (la réponse principale)
+    return parts.slice(1).join('\n').trim();
+  }
+  
+  // Si pas de saut de ligne, vérifier si c'est une réponse complexe
+  const lowerReponse = reponse.toLowerCase();
+  if (lowerReponse.includes('non') && reponse.length > 3) {
+    // Extraire les détails après "non"
+    const details = reponse.substring(3).trim();
+    return details || '';
+  }
+  
+  if (lowerReponse.includes('oui') && reponse.length > 3) {
+    const details = reponse.substring(3).trim();
+    return details || '';
+  }
+  
+  return '';
+}
 
+// ✅ Méthode pour extraire seulement la réponse principale
+private getMainResponse(reponse: string): string {
+  if (!reponse) return '';
+  
+  // Prendre seulement la première ligne ou le premier mot
+  const firstLine = reponse.split('\n')[0].trim();
+  const lowerFirstLine = firstLine.toLowerCase();
+  
+  // Simplifier la réponse
+  if (lowerFirstLine.includes('oui') || lowerFirstLine === 'o') return 'oui';
+  if (lowerFirstLine.includes('non') || lowerFirstLine === 'n') return 'non';
+  if (lowerFirstLine.includes('partiel')) return 'partiellement';
+  if (lowerFirstLine.includes('applicable') || lowerFirstLine === 'na') return 'non applicable';
+  
+  return firstLine;
+}
 
   // Ajoutez cette méthode pour debugger l'état du composant
 private checkComponentState(): void {
