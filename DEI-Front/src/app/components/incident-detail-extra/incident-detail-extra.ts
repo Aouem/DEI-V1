@@ -195,21 +195,19 @@ filteredCount: number = 0;
 
   // --------------------- Filtrage ---------------------
 filterByFamille() {
-  const filtered = this.getFilteredByFamille();
-  this.totalFilteredIncidents = filtered.length; // compteur ✅
+  const filtered = this.getFilteredIncidents();
+  this.totalFilteredIncidents = filtered.length;
   
   this.currentPage = 1;
 
-  // Mettre à jour la liste affichée si tu as une pagination
- this.paginatedIncidents = filtered.slice(
-  (this.currentPage - 1) * this.pageSize,
-  this.currentPage * this.pageSize
-);
+  // Mettre à jour la pagination
+  this.paginatedIncidents = filtered.slice(
+    (this.currentPage - 1) * this.pageSize,
+    this.currentPage * this.pageSize
+  );
 
-
-  // Mettre à jour les charts
-  this.updateFamilleChart(filtered);
-  this.updateFamilleCharts(filtered);
+  // Mettre à jour toutes les statistiques avec les nouvelles données filtrées
+  this.updateStats();
 
   this.cdr.detectChanges();
 }
@@ -239,16 +237,16 @@ getFilteredByFamille(): any[] {
 }
 
 
-  getPagedFamilleIncidents(): any[] {
-    const filtered = this.getFilteredByFamille();
-    const sorted = [...filtered].sort((a, b) => {
-      const ta = a?.dateDeclaration ? new Date(a.dateDeclaration).getTime() : 0;
-      const tb = b?.dateDeclaration ? new Date(b.dateDeclaration).getTime() : 0;
-      return tb - ta;
-    });
-    const start = (this.currentPage - 1) * this.pageSize;
-    return sorted.slice(start, start + this.pageSize);
-  }
+getPagedFamilleIncidents(): any[] {
+  const filtered = this.getFilteredIncidents();
+  const sorted = [...filtered].sort((a, b) => {
+    const ta = a?.dateDeclaration ? new Date(a.dateDeclaration).getTime() : 0;
+    const tb = b?.dateDeclaration ? new Date(b.dateDeclaration).getTime() : 0;
+    return tb - ta;
+  });
+  const start = (this.currentPage - 1) * this.pageSize;
+  return sorted.slice(start, start + this.pageSize);
+}
 
   getFamilles(includeToutes: boolean = false): string[] {
     const familles = Array.from(new Set(
@@ -275,45 +273,60 @@ getFilteredByFamille(): any[] {
 
 
   updateStats() {
-    this.statutCount = {};
-    this.graviteCount = {};
-    this.statsMatrix = {};
-    this.graviteLabels = [];
+  const filteredIncidents = this.getFilteredIncidents(); // Utiliser les données filtrées
+  
+  this.statutCount = {};
+  this.graviteCount = {};
+  this.statsMatrix = {};
+  this.graviteLabels = [];
+  this.familleCount = {};
+  this.famillePercent = {};
 
-    // Comptage et matrice
-    this.incidents.forEach(inc => {
-      const statutNum = inc.statut ?? -1;
-      const graviteNum = inc.gravite ?? -1;
+  // Comptage et matrice
+  filteredIncidents.forEach(inc => {
+    const statutNum = inc.statut ?? -1;
+    const graviteNum = inc.gravite ?? -1;
 
-      const statut = this.getStatusLabel(statutNum);
-      const gravite = this.getGraviteLabel(graviteNum);
+    const statut = this.getStatusLabel(statutNum);
+    const gravite = this.getGraviteLabel(graviteNum);
 
-      // Comptage
-      this.statutCount[statut] = (this.statutCount[statut] || 0) + 1;
-      this.graviteCount[gravite] = (this.graviteCount[gravite] || 0) + 1;
+    // Comptage
+    this.statutCount[statut] = (this.statutCount[statut] || 0) + 1;
+    this.graviteCount[gravite] = (this.graviteCount[gravite] || 0) + 1;
 
-      // Matrice
-      if (!this.statsMatrix[statut]) this.statsMatrix[statut] = {};
-      this.statsMatrix[statut][gravite] = (this.statsMatrix[statut][gravite] || 0) + 1;
+    // Matrice
+    if (!this.statsMatrix[statut]) this.statsMatrix[statut] = {};
+    this.statsMatrix[statut][gravite] = (this.statsMatrix[statut][gravite] || 0) + 1;
 
-      // Labels gravité uniques
-      if (!this.graviteLabels.includes(gravite)) this.graviteLabels.push(gravite);
+    // Labels gravité uniques
+    if (!this.graviteLabels.includes(gravite)) this.graviteLabels.push(gravite);
+
+    // Comptage par famille
+    this.detectFamille(inc).forEach(fs => {
+      this.familleCount[fs.famille] = (this.familleCount[fs.famille] || 0) + 1;
     });
+  });
 
-    // Tri gravité selon ordre croissant
-    const graviteOrderAsc = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
-    this.sortedGraviteLabels = this.graviteLabels.slice().sort((a, b) => graviteOrderAsc.indexOf(a) - graviteOrderAsc.indexOf(b));
+  // Tri gravité selon ordre croissant
+  const graviteOrderAsc = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
+  this.sortedGraviteLabels = this.graviteLabels.slice().sort((a, b) => graviteOrderAsc.indexOf(a) - graviteOrderAsc.indexOf(b));
 
-    const total = this.incidents.length || 1;
-    Object.keys(this.statutCount).forEach(k => this.statutPercent[k] = Math.round(this.statutCount[k] / total * 100));
-    Object.keys(this.graviteCount).forEach(k => this.gravitePercent[k] = Math.round(this.graviteCount[k] / total * 100));
+  const total = filteredIncidents.length || 1;
+  
+  // Calcul des pourcentages
+  Object.keys(this.statutCount).forEach(k => this.statutPercent[k] = Math.round(this.statutCount[k] / total * 100));
+  Object.keys(this.graviteCount).forEach(k => this.gravitePercent[k] = Math.round(this.graviteCount[k] / total * 100));
+  Object.keys(this.familleCount).forEach(k => this.famillePercent[k] = Math.round(this.familleCount[k] / total * 100));
 
-    this.totalFilteredIncidents = this.incidents.length;
-    this.totalIncidents = this.incidents.length;
+  this.totalFilteredIncidents = filteredIncidents.length;
+  this.totalIncidents = filteredIncidents.length;
 
-    // Mise à jour des graphiques
-    this.updateChartData();
-  }
+  // Mise à jour des graphiques avec les données filtrées
+  this.updateChartData();
+  this.updateFamilleChart(filteredIncidents);
+  this.updateFamilleCharts(filteredIncidents);
+}
+
 
   private updateChartData() {
     // Graphique pour les statuts
@@ -714,17 +727,16 @@ public detectFamille(incident: any): { elementsConcernees: string, famille: stri
     };
     return map[label] ?? 100;
   }
+
+  
   getGraviteTotal(gravite: string): number {
-  if (!this.incidents) {
-    return 0;
-  }
-  return this.incidents.filter(i => i.gravite === gravite).length;
+  const filtered = this.getFilteredIncidents();
+  return filtered.filter(i => this.getGraviteLabel(i.gravite) === gravite).length;
 }
+
 getStatutTotal(statut: string): number {
-  if (!this.incidents) {
-    return 0;
-  }
-  return this.incidents.filter(i => i.statut === statut).length;
+  const filtered = this.getFilteredIncidents();
+  return filtered.filter(i => this.getStatusLabel(i.statut) === statut).length;
 }
 
 ///////////status//////filtre
@@ -746,17 +758,17 @@ getFilteredByPeriod(): any[] {
   return filtered;
 }
 
-// Met à jour les stats et le graphique
 // FILTRAGE GLOBAL
   // -----------------------
 getFilteredIncidents(): any[] {
   let filtered = this.incidents || [];
 
   // Filtre par famille
-  if (this.selectedFamille) {
-    filtered = filtered.filter(i => i.famille === this.selectedFamille);
+ if (this.selectedFamille && this.selectedFamille !== 'Toutes') {
+    filtered = filtered.filter(i =>
+      this.detectFamille(i).some(fs => fs.famille === this.selectedFamille)
+    );
   }
-
   // Filtre par période
   if (this.startDate) {
     const start = new Date(this.startDate);
@@ -769,7 +781,6 @@ getFilteredIncidents(): any[] {
 
   return filtered;
 }
-
   // -----------------------
   // Mise à jour statistiques
   // -----------------------
@@ -825,6 +836,15 @@ getFilteredIncidents(): any[] {
   keys(obj: any) {
     return Object.keys(obj);
   }
+
+// Méthode pour effacer tous les filtres
+clearFilters() {
+  this.selectedFamille = '';
+  this.startDate = '';
+  this.endDate = '';
+  this.filterByFamille(); // Cela va recalculer avec tous les incidents
+}
+  
 }
 // Définir le type minimal pour un incident
 

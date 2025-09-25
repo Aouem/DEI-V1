@@ -1,3 +1,13 @@
+<!-- Indicateur de filtre actif -->
+<div *ngIf="startDate || endDate || selectedFamille" class="alert alert-info mb-3">
+  <strong>Filtres actifs :</strong>
+  <span *ngIf="startDate">Du {{ startDate | date:'dd/MM/yyyy' }}</span>
+  <span *ngIf="endDate"> au {{ endDate | date:'dd/MM/yyyy' }}</span>
+  <span *ngIf="selectedFamille && selectedFamille !== 'Toutes'"> | Famille : {{ selectedFamille }}</span>
+  <button class="btn btn-sm btn-outline-secondary ms-2" (click)="clearFilters()">Effacer les filtres</button>
+</div>
+
+
 <!-- 🔍 Filtre par famille -->
 <div class="mb-3 d-flex align-items-center gap-3">
   <label for="familleFilter" class="form-label fw-bold m-0">Filtrer par famille :</label>
@@ -115,7 +125,9 @@
 
 <!-- 📊 Tableau Statut -->
 <div class="mt-4 stats-section" *ngIf="totalIncidents > 0">
-  <h3 class="stats-title">📊 Statistiques des incidents par statut</h3>
+  <h3 class="stats-title">📊 Statistiques des incidents par statut 
+    <span class="badge bg-secondary">({{ totalIncidents }} incident(s))</span>
+  </h3>
   <button class="btn btn-primary mb-2"
           (click)="printTable('statutTable', 'Statistiques des incidents par statut')">
     🖨️ Imprimer
@@ -149,7 +161,9 @@
 
 <!-- ⚠️ Tableau Gravité -->
 <div class="mt-4 stats-section" *ngIf="totalIncidents > 0">
-  <h3 class="stats-title gravite-title">⚠️ Statistiques des incidents par gravité</h3>
+  <h3 class="stats-title gravite-title">⚠️ Statistiques des incidents par gravité
+    <span class="badge bg-secondary">({{ totalIncidents }} incident(s))</span>
+  </h3>
   <button class="btn btn-primary mb-2"
           (click)="printTable('graviteTable', 'Statistiques des incidents par gravité')">
     🖨️ Imprimer
@@ -183,7 +197,9 @@
 
 <!-- 🧮 Matrice Statut/Gravité -->
 <div class="mt-4 stats-section" *ngIf="totalIncidents > 0">
-  <h3 class="stats-title matrix-title">🧮 Matrice Statut / Gravité</h3>
+  <h3 class="stats-title matrix-title">🧮 Matrice Statut / Gravité
+    <span class="badge bg-secondary">({{ totalIncidents }} incident(s))</span>
+  </h3>
   <button class="btn btn-primary mb-2"
           (click)="printTable('matrixTable', 'Matrice Statut / Gravité')">
     🖨️ Imprimer
@@ -217,3 +233,4 @@
     </canvas>
   </div>
 </div>
+
