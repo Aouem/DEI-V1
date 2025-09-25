@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class SubmissionService {
-  private apiUrl = `${environment.apiUrl}/api/AlarmResponse`; // API backend
+  private apiUrl = `${environment.apiUrl}/api/AlarmResponse`; // URL de l'API backend
   private currentIncident: any = null;
 
   constructor(private http: HttpClient) {}
@@ -16,49 +16,54 @@ export class SubmissionService {
   /** 🔹 Obtenir toutes les submissions */
   getAllSubmissions(): Observable<SubmissionData[]> {
     return this.http.get<SubmissionData[]>(this.apiUrl).pipe(
-      catchError(error => {
-        console.error('Erreur dans le service:', error);
+      catchError(err => {
+        console.error('Erreur lors de la récupération de toutes les submissions:', err);
         return of([]);
       })
     );
   }
 
-  /** 🔹 Obtenir une submission par id */
-  getSubmissionById(id: number): Observable<SubmissionData> {
-    return this.http.get<SubmissionData>(`${this.apiUrl}/${id}`).pipe(
-      catchError(err => {
-        console.error('Erreur lors de la récupération par id:', err);
-        return of(null as any);
-      })
-    );
-  }
-
-  /** 🔹 Créer une nouvelle submission */
-createSubmission(payload: SubmissionCreate): Observable<SubmissionData> {
-  return this.http.post<SubmissionData>(this.apiUrl, payload).pipe(
+  /** 🔹 Obtenir une submission par ID */
+getSubmissionById(id: number): Observable<SubmissionData | null> {
+  if (!id) return of(null);
+  
+  const url = `${this.apiUrl}/${id}`;
+  console.log('🔄 Appel API vers:', url);
+  
+  return this.http.get<SubmissionData>(url).pipe(
     catchError(err => {
-      console.error('Erreur lors de la création de la submission:', err);
-      return of(null as any);
+      console.error(`❌ Erreur API pour ID ${id}:`, err);
+      return of(null);
     })
   );
 }
 
+  /** 🔹 Créer une nouvelle submission */
+  createSubmission(payload: SubmissionCreate): Observable<SubmissionData | null> {
+    return this.http.post<SubmissionData>(this.apiUrl, payload).pipe(
+      catchError(err => {
+        console.error('Erreur lors de la création de la submission:', err);
+        return of(null);
+      })
+    );
+  }
 
   /** 🔹 Supprimer une submission */
   deleteSubmission(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       catchError(err => {
-        console.error('Erreur lors de la suppression:', err);
+        console.error(`Erreur lors de la suppression de la submission ID ${id}:`, err);
         return of();
       })
     );
   }
 
-  /** 🔹 Filtrer par incident */
+  /** 🔹 Filtrer par incident ID */
   getSubmissionsByIncidentId(incidentId: number): Observable<SubmissionData[]> {
+    if (!incidentId) return of([]);
     return this.http.get<SubmissionData[]>(`${this.apiUrl}/by-incident/${incidentId}`).pipe(
       catchError(err => {
-        console.error('Erreur lors de la récupération par incidentId:', err);
+        console.error(`Erreur lors de la récupération des submissions pour l'incident ${incidentId}:`, err);
         return of([]);
       })
     );

@@ -1,40 +1,141 @@
-<div *ngIf="hasData; else noData">
-  <h2>Confirmation de la soumission #{{ submissionId }}</h2>
-  <p>Date : {{ submissionDate | date:'medium' }}</p>
-
-<div *ngFor="let category of groupedResponses | keyvalue: preserveOrder">
-<h3>... (Risque : {{ categoryRiskScores[category.key].riskLevel }})</h3>
-    <table border="1" width="100%" style="margin-bottom: 20px;">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Question</th>
-          <th>Réponse</th>
-          <th>Détails</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let resp of category.value">
-          <td>{{ resp.id }}</td>
-          <td>{{ resp.question }}</td>
-          <td>{{ resp.response }}</td>
-          <td>{{ resp.details || '-' }}</td>
-        </tr>
-      </tbody>
-    </table>
+<div class="confirmation-container">
+  <!-- En-tête -->
+  <div class="confirmation-header">
+  <div class="submission-info">
+  <p><strong>ID :</strong> {{ submissionId || 'N/A' }}</p>
+  <p><strong>Date :</strong> {{ submissionDate ? (submissionDate | date:'dd/MM/yyyy à HH:mm') : 'N/A' }}</p>
+  <p><strong>Incident :</strong>
+    <span *ngIf="incidentId && incidentId > 0; else noIncident" class="incident-badge">
+      {{ incidentId }}
+    </span>
+    <ng-template #noIncident>
+      <span class="no-incident">Non spécifié</span>
+    </ng-template>
+  </p>
+</div>
   </div>
 
-  <h3>Questions à investiguer</h3>
-  <ul>
-    <li *ngFor="let q of questionsToInvestigate">
-      {{ q.question }} - {{ q.response }}
-    </li>
-  </ul>
+  <!-- Contenu principal -->
+  <div *ngIf="hasData && responses.length > 0; else noData">
+    <!-- Groupement par catégorie -->
+    <div *ngFor="let category of (groupedResponses | keyvalue: preserveOrder)" class="category-section">
+      <h2>{{ getCategoryDisplayName(category.key) }}</h2>
+      <p class="category-stats"><em>Statistiques : {{ getCategoryStats(category.value) }}</em></p>
 
-  <button (click)="printPage()">Imprimer</button>
-  <button (click)="goToAllSubmissions()">Retour aux soumissions</button>
+      <div *ngFor="let sub of getSubCategories(category.value)" class="subcategory-section">
+        <h3>{{ sub.name }} <span class="subcategory-stats">({{ getSubCategoryStats(sub.responses) }})</span></h3>
+        <div class="table-responsive">
+          <table class="responses-table">
+            <thead>
+              <tr>
+                <th width="80px">Question #</th>
+                <th>Question</th>
+                <th width="120px">Réponse</th>
+                <th width="200px">Détails</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let resp of sub.responses" [ngClass]="getResponseClass(resp.response)">
+                <td class="question-number">{{ getQuestionNumber(resp.id) }}</td>
+                <td class="question-text">{{ resp.question }}</td>
+                <td class="response-cell">
+                  <span [ngClass]="'response-badge ' + getResponseClass(resp.response)">
+                    {{ getResponseDisplay(resp.response) }}
+                  </span>
+                </td>
+                <td class="details-cell">{{ resp.details || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analyse des causes profondes -->
+    <section class="analysis-section">
+      <h2>Analyse des causes profondes</h2>
+
+      <div class="analysis-grid">
+        <!-- Résumé par catégorie -->
+        <div class="risk-summary">
+          <h3>Résumé par catégorie</h3>
+          <div class="table-responsive">
+            <table class="risk-table">
+              <thead>
+                <tr>
+                  <th>Catégorie</th>
+                  <th>Total</th>
+                  <th>Oui</th>
+                  <th>Non</th>
+                  <th>Partiel</th>
+                  <th>Niveau de risque</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cat of (categoryRiskScores | keyvalue: preserveOrder)" 
+                    [ngClass]="'risk-' + cat.value.riskLevel.toLowerCase()">
+                  <td class="category-name">{{ getCategoryDisplayName(cat.key) }}</td>
+                  <td>{{ cat.value.total }}</td>
+                  <td class="positive">{{ cat.value.yes }}</td>
+                  <td class="negative">{{ cat.value.no }}</td>
+                  <td class="partial">{{ cat.value.partial }}</td>
+                  <td class="risk-level">
+                    <span [ngClass]="'risk-badge risk-' + cat.value.riskLevel.toLowerCase()">
+                      {{ cat.value.riskLevel }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Questions à investiguer -->
+<div class="investigation-list" *ngIf="questionsToInvestigate.length > 0">
+          <h3>Questions à investiguer <span class="badge">{{ questionsToInvestigate.length }}</span></h3>
+          <div class="questions-list">
+            <div *ngFor="let q of questionsToInvestigate" class="question-item">
+              <div class="question-header">
+                <strong class="question-ref">{{ getQuestionNumber(q.id) }}</strong>
+                <span [ngClass]="'response-indicator ' + getResponseClass(q.response)">
+                  {{ getResponseDisplay(q.response) }}
+                </span>
+              </div>
+              <div class="question-text">{{ q.question }}</div>
+              <div *ngIf="q.details" class="question-details">
+                <strong>Détails :</strong> {{ q.details }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Template pour les données absentes -->
+  <ng-template #noData>
+    <div class="no-data-message">
+      <div *ngIf="!hasData" class="error-state">
+        <h3>Aucune donnée de soumission disponible</h3>
+        <p>Impossible de charger les données de la soumission.</p>
+      </div>
+      <div *ngIf="hasData && (!responses || responses.length === 0)" class="empty-state">
+        <h3>Aucune réponse disponible</h3>
+        <p>Cette soumission ne contient aucune réponse.</p>
+      </div>
+      <button (click)="goToAllSubmissions()" class="btn-primary">
+        ← Retour à l'historique des soumissions
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Actions -->
+<div class="actions" *ngIf="hasData && responses.length > 0">
+    <button (click)="goToAllSubmissions()" class="btn-secondary">
+      ← Retour à la liste
+    </button>
+    <button (click)="printPage()" class="btn-primary">
+      🖨️ Imprimer
+    </button>
+  </div>
 </div>
-
-<ng-template #noData>
-  <p>Aucune soumission trouvée.</p>
-</ng-template>

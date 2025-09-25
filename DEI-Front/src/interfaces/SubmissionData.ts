@@ -7,14 +7,14 @@ export interface SubmissionMetadata {
 export interface ReponseData {
   id: number;
   questionId: number;
-  categorie: string;        // ← ici c’est 'categorie'
-  sousCategorie: string;
-  question: string;
-  reponse: string;          // ← ici c’est 'reponse'
-  commentaire: string;
-  alarmResponseId: number;
-  alarmResponse?: any;
+  reponse: string;
   texte?: string;
+  categorie?: string;
+  sousCategorie?: string;
+  question?: string;
+  commentaire?: string;
+  alarmResponseId?: number;
+  alarmResponse?: any;
 }
 
 export interface ReponseDataCreate {
@@ -37,10 +37,9 @@ export interface SubmissionCreate {
 
 export interface SubmissionData {
   id: number;
-  reponses: ReponseData[];
   createdAt: string;
-  incidentId: number;
+  reponses: ReponseData[];
+  incidentId?: number; // ✅ Même type partout
   metadata?: SubmissionMetadata;
 }
-
 
