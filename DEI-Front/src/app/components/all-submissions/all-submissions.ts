@@ -199,4 +199,26 @@ getIncidentId(sub: SubmissionData): number | null {
   reloadData(): void {
     this.loadSubmissions();
   }
+
+  /** Supprimer une soumission */
+/** Supprimer une soumission */
+deleteSubmission(sub: SubmissionData): void {
+  if (!sub.id) return;
+
+  if (confirm(`Voulez-vous vraiment supprimer la soumission #${sub.id} ?`)) {
+    this.submissionService.deleteSubmission(sub.id).subscribe({
+      next: () => {
+        console.log(`Soumission ${sub.id} supprimée ✅`);
+        // Recharger toute la liste après suppression
+        this.loadSubmissions();
+      },
+      error: (err) => {
+        console.error('Erreur lors de la suppression:', err);
+        alert('❌ Échec de la suppression.');
+      }
+    });
+  }
+}
+
+
 }
