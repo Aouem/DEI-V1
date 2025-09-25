@@ -696,32 +696,19 @@
 </form>
 
 <!-- Indicateur de statut -->
-<div class="card mb-4 border-primary">
+<div class="card mb-4 border-primary shadow-sm">
   <div class="card-header bg-light d-flex justify-content-between align-items-center">
     <h4 class="fw-bold mb-0">Statut de la déclaration</h4>
-    <span class="badge" [ngClass]="{
-      'bg-secondary': incidentForm.value.statut === 0,
-      'bg-primary': incidentForm.value.statut === 1,
-      'bg-info': incidentForm.value.statut === 2,
-      'bg-warning': incidentForm.value.statut === 3,
-      'bg-success': incidentForm.value.statut === 4,
-      'bg-dark': incidentForm.value.statut === 5
-    }">
+    <span class="badge d-flex align-items-center p-2" [ngClass]="getBadgeClass(incidentForm.value.statut)">
+      <i class="me-1" [ngClass]="getStatutIcon(incidentForm.value.statut)"></i>
       {{ getStatutLabel(incidentForm.value.statut) }}
     </span>
   </div>
   <div class="card-body">
-    <div class="progress mb-2" style="height: 20px;">
+    <div class="progress mb-2" style="height: 25px; border-radius: 12px; overflow: hidden;">
       <div class="progress-bar" role="progressbar" 
-           [ngStyle]="{'width': (incidentForm.value.statut/5*100) + '%'}" 
-           [ngClass]="{
-             'bg-secondary': incidentForm.value.statut === 0,
-             'bg-primary': incidentForm.value.statut === 1,
-             'bg-info': incidentForm.value.statut === 2,
-             'bg-warning': incidentForm.value.statut === 3,
-             'bg-success': incidentForm.value.statut === 4,
-             'bg-dark': incidentForm.value.statut === 5
-           }">
+           [ngStyle]="{'width': (incidentForm.value.statut / 5 * 100) + '%'}" 
+           [ngClass]="getProgressBarClass(incidentForm.value.statut)">
       </div>
     </div>
     <small class="text-muted">

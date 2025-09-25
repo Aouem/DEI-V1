@@ -7,6 +7,8 @@ import { TypeEvenement } from '../../../interfaces/TypeEvenement';
 import { Subject, debounceTime } from 'rxjs';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 
 export enum StatutDeclaration {
@@ -1169,6 +1171,92 @@ clearFilters() {
 }
   
 
+
+/////////////////////excel///////////////
+
+
+
+// Statistiques à calculer depuis tes incidents
+incidentsParStatut: { [key: string]: number } = {};
+incidentsParGravite: { [key: string]: number } = {};
+incidentsParFamille: { [key: string]: { sousFamille: string, count: number } } = {};
+
+
+exportToExcelMulti(): void {
+  // 1️⃣ Onglet : Incidents détaillés
+  const incidentsData = this.incidents.map(inc => ({
+    ID: inc.id,
+    Date: inc.dateDeclaration,
+    Statut: this.getStatusLabel(inc.statut),
+    Gravité: this.getGraviteLabel(inc.gravite),
+    Familles: this.detectFamille(inc).map(f => f.famille).join(', '),
+    SousFamilles: this.detectFamille(inc).map(f => f.sousFamille).join(', '),
+    Description: inc.description || ''
+  }));
+  const wsIncidents = XLSX.utils.json_to_sheet(incidentsData);
+
+  // 2️⃣ Onglet : Statut
+  const statusData = Object.entries(this.incidentsParStatut).map(([key, value]) => ({
+    Statut: key,
+    Nombre: value
+  }));
+  const wsStatus = XLSX.utils.json_to_sheet(statusData);
+
+  // 3️⃣ Onglet : Gravité
+  const graviteData = Object.entries(this.incidentsParGravite).map(([key, value]) => ({
+    Gravité: key,
+    Nombre: value
+  }));
+  const wsGravite = XLSX.utils.json_to_sheet(graviteData);
+
+  // 4️⃣ Onglet : Familles / Sous-familles
+  const familleData = Object.entries(this.incidentsParFamille).map(([key, value]) => ({
+    Famille: key,
+    SousFamille: value.sousFamille,
+    Nombre: value.count
+  }));
+  const wsFamille = XLSX.utils.json_to_sheet(familleData);
+
+  // Créer le classeur avec tous les onglets
+  const workbook: XLSX.WorkBook = {
+    Sheets: {
+      'Incidents': wsIncidents,
+      'Statut': wsStatus,
+      'Gravité': wsGravite,
+      'Famille': wsFamille
+    },
+    SheetNames: ['Incidents', 'Statut', 'Gravité', 'Famille']
+  };
+
+  // Générer et sauvegarder le fichier
+  const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  saveAs(blob, `Incidents_Multi_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+computeStats() {
+  // Réinitialiser
+  this.incidentsParStatut = {};
+  this.incidentsParGravite = {};
+  this.incidentsParFamille = {};
+
+  this.incidents.forEach(inc => {
+    // Statut
+    const stat = inc.statut || 'Non défini';
+    this.incidentsParStatut[stat] = (this.incidentsParStatut[stat] || 0) + 1;
+
+    // Gravité
+    const grav = inc.gravite || 'Non défini';
+    this.incidentsParGravite[grav] = (this.incidentsParGravite[grav] || 0) + 1;
+
+    // Famille
+    const fam = inc.famille || 'Non défini';
+    const sous = inc.sousFamille || '';
+    this.incidentsParFamille[fam] = { 
+      sousFamille: sous, 
+      count: (this.incidentsParFamille[fam]?.count || 0) + 1 
+    };
+  });
+}
 
 
 }

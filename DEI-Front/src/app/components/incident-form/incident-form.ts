@@ -840,5 +840,40 @@ getStatutLabel(statut: number): string {
     default: return 'Inconnu';
   }
 }
+getBadgeClass(statut: number): string {
+  switch(statut) {
+    case 0: return 'bg-secondary text-white';
+    case 1: return 'bg-primary text-white';
+    case 2: return 'bg-info text-dark';
+    case 3: return 'bg-warning text-dark';
+    case 4: return 'bg-success text-white';
+    case 5: return 'bg-dark text-white';
+    default: return 'bg-light text-dark';
+  }
+}
+
+getProgressBarClass(statut: number): string {
+  switch(statut) {
+    case 0: return 'bg-secondary';
+    case 1: return 'bg-primary';
+    case 2: return 'bg-info';
+    case 3: return 'bg-warning';
+    case 4: return 'bg-success';
+    case 5: return 'bg-dark';
+    default: return 'bg-light';
+  }
+}
+
+getStatutIcon(statut: number): string {
+  switch(statut) {
+    case 0: return 'bi bi-pencil-square';      // Brouillon
+    case 1: return 'bi bi-send';               // Soumis
+    case 2: return 'bi bi-search';             // En cours d'analyse
+    case 3: return 'bi bi-exclamation-triangle'; // Action requise
+    case 4: return 'bi bi-check-circle';       // Résolu
+    case 5: return 'bi bi-lock';               // Clôturé
+    default: return 'bi bi-question-circle';
+  }
+}
 
 }

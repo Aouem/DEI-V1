@@ -594,3 +594,6 @@ button[disabled] {
   font-weight: bold;         /* texte du label en gras */
   color: #0f5132;            /* texte vert foncé */
 }
+.progress-bar {
+  transition: width 0.5s ease;
+}
