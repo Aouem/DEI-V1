@@ -29,6 +29,19 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['DECLARANT'] }
   },
+  {
+  path: 'dashboard-user',
+  component: DashbordDeclarantComponent,
+  canActivate: [AuthGuard, RoleGuard],
+  data: { roles: ['DECLARANT'] }
+},
+{
+  path: 'incident-form',
+  component: IncidentFormComponent,
+  canActivate: [AuthGuard, RoleGuard],
+  data: { roles: ['DECLARANT', 'ADMIN'] }
+},
+
 
   // Dashboard validateur (spécifique)
   {
@@ -65,9 +78,7 @@ const routes: Routes = [
   },
 
   // Redirection par défaut
-  { path: '**', redirectTo: 'dashboard' },
-
- { path: 'dashboard-user', component: DashbordDeclarantComponent, canActivate: [AuthGuard, RoleGuard], data: { roles: ['DECLARANT'] } }
+  { path: '**', redirectTo: 'dashboard' }
 ];
 
 @NgModule({

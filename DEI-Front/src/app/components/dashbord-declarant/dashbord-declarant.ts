@@ -1,9 +1,10 @@
+// src/app/components/dashbord-declarant/dashbord-declarant.ts
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IncidentService } from '../../services/incident';
 import { AuthService } from '../../services/auth-service';
-import { Incident, StatutDeclaration, StatutDeclarationLabels, GraviteEvenement, GraviteEvenementLabels } from '../../../interfaces/incident';
+import { IncidentService } from '../../services/incident';
+import { Incident } from '../../../interfaces/incident';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashbord-declarant',
@@ -13,94 +14,77 @@ import { Incident, StatutDeclaration, StatutDeclarationLabels, GraviteEvenement,
   styleUrls: ['./dashbord-declarant.css']
 })
 export class DashbordDeclarantComponent implements OnInit {
+  currentUser: any;
 
-  currentUserId: string = '';
-  incidents: Incident[] = [];
-
-  // Comptage par statut
-  pendingCount = 0;
-  brouillonCount = 0;
-  resolvedCount = 0;
+  todayIncidentCount = 0;
+  severityCount: { [key: number]: number } = {}; // ⚠️ Définition obligatoire
 
   constructor(
     private authService: AuthService,
-    private incidentService: IncidentService,
     private router: Router,
-      private location: Location // ← ajout
-
+    private incidentService: IncidentService
   ) {}
 
   ngOnInit(): void {
-    // 🔹 Récupération de l'utilisateur connecté depuis le token
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.currentUserId = user.id;
-    }
-
-    // 🔹 Charger les incidents déclarés par cet utilisateur
-    this.incidentService.getIncidents().subscribe((incidents: Incident[]) => {
-      // Filtrer uniquement les incidents du déclarant connecté
-      this.incidents = incidents.filter(i => i.declarantId === this.currentUserId);
-
-      // Calcul des stats
-      this.calculerStats();
-    });
+    this.currentUser = this.authService.getCurrentUser();
+    this.loadTodayIncidents();
   }
 
-  calculerStats(): void {
-    this.pendingCount = 0;
-    this.brouillonCount = 0;
-    this.resolvedCount = 0;
-
-    this.incidents.forEach(incident => {
-      switch (incident.statut) {
-        case StatutDeclaration.Soumis:
-          this.pendingCount++;
-          break;
-        case StatutDeclaration.Brouillon:
-          this.brouillonCount++;
-          break;
-        case StatutDeclaration.Resolu:
-        case StatutDeclaration.Cloture:
-          this.resolvedCount++;
-          break;
-        default:
-          break;
-      }
-    });
+  // 🔹 Navigation vers le formulaire
+  navigateToIncidentForm(): void {
+    this.router.navigate(['/incident-form']);
   }
 
-  // 🔹 Navigation
-  navigateTo(path: string): void {
-    this.router.navigate([path]);
-  }
-
+  // 🔹 Déconnexion
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  // 🔹 Couleur selon gravité (optionnel)
-  getSeverityColor(severity: GraviteEvenement | undefined): string {
+  // 🔹 Retourne les incidents d’aujourd’hui et comptage par gravité
+  loadTodayIncidents(): void {
+    this.incidentService.getIncidents().subscribe((incidents: Incident[]) => {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      const todayIncidents = incidents.filter(i => {
+        const date = new Date(i['dateSurvenue']);
+        date.setHours(0,0,0,0);
+        return date.getTime() === today.getTime();
+      });
+
+      this.todayIncidentCount = todayIncidents.length;
+
+      this.severityCount = {};
+      todayIncidents.forEach(i => {
+        const g = i['gravite'] ?? 0;
+        this.severityCount[g] = (this.severityCount[g] || 0) + 1;
+      });
+    });
+  }
+
+  // 🔹 Clés de gravité pour *ngFor
+  severityKeys(): number[] {
+    return Object.keys(this.severityCount).map(k => Number(k)).sort();
+  }
+
+  // 🔹 Classe CSS selon le nombre d’incidents
+  getIncidentClass(count: number): string {
+    if (count === 0) return 'zero';
+    if (count <= 2) return 'low';
+    if (count <= 5) return 'medium';
+    return 'high';
+  }
+
+  // 🔹 Couleur selon gravité
+  getSeverityColor(severity: number): string {
     switch(severity) {
-      case GraviteEvenement.Benin: return '#4caf50';
-      case GraviteEvenement.PeuGrave: return '#ffeb3b';
-      case GraviteEvenement.Moyenne: return '#ff9800';
-      case GraviteEvenement.Grave: return '#f44336';
-      case GraviteEvenement.TresGrave: return '#9c27b0';
-      case GraviteEvenement.Catastrophique: return '#000000';
+      case 1: return '#4caf50';
+      case 2: return '#ffeb3b';
+      case 3: return '#ff9800';
+      case 4: return '#f44336';
+      case 5: return '#9c27b0';
       default: return '#757575';
     }
   }
-
-  // 🔹 Libellé du statut
-  getStatutLabel(statut: StatutDeclaration): string {
-    return StatutDeclarationLabels[statut] || 'Inconnu';
-  }
-
-goBack(): void {
-  window.history.back();
-}
-
-
 }
