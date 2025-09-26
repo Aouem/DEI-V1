@@ -305,3 +305,14 @@
 .incident-number.high {
   color: #f44336; /* rouge */
 }
+.image-right {
+  text-align: right; /* place le contenu à droite */
+  margin: 20px 0;
+}
+
+.zoomed-img {
+  transform: scale(1); /* zoom x3 */
+  transform-origin: top right; /* point d’ancrage du zoom */
+  display: inline-block;
+}
+
