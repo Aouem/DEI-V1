@@ -311,7 +311,7 @@
 }
 
 .zoomed-img {
-  transform: scale(1); /* zoom x3 */
+  transform: scale(2.5); /* zoom x3 */
   transform-origin: top right; /* point d’ancrage du zoom */
   display: inline-block;
 }
