@@ -130,12 +130,12 @@ applyFilters(): void {
       },
       error: (err) => {
         if (err.status === 400) {
-          console.warn('Aucun schéma à supprimer');
+        //  console.warn('Aucun schéma à supprimer');
           this.arbres = this.arbres.filter(a => a.incidentId !== arbre.incidentId);
           this.filteredArbres = this.filteredArbres.filter(a => a.incidentId !== arbre.incidentId);
           this.successMessage = '✅ Arbre des causes supprimé avec succès';
         } else {
-          console.error('Erreur deleteArbre', err);
+       //   console.error('Erreur deleteArbre', err);
           this.errorMessage = '❌ Erreur lors de la suppression';
         }
         this.arbreToDelete = null;

@@ -32,32 +32,32 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
-      console.warn('Formulaire invalide');
+   //   console.warn('Formulaire invalide');
       return;
     }
 
     this.isSubmitting = true;
     this.errorMessage = '';
-    console.log('🔹 Tentative de connexion pour:', this.loginForm.value.userName);
+   // console.log('🔹 Tentative de connexion pour:', this.loginForm.value.userName);
 
     this.authService.login({
       UserName: this.loginForm.value.userName,
       Password: this.loginForm.value.password
     }).subscribe({
       next: () => {
-        console.log('✅ Login réussi, récupération de l’utilisateur...');
+      //  console.log('✅ Login réussi, récupération de l’utilisateur...');
         const user = this.authService.getCurrentUser();
 
-        console.log('🔹 USER CONNECTÉ:', user);
+   //     console.log('🔹 USER CONNECTÉ:', user);
 
         if (!user) {
-          console.error('❌ Aucun utilisateur trouvé après login.');
+       //   console.error('❌ Aucun utilisateur trouvé après login.');
           this.isSubmitting = false;
           return;
         }
 
         // 🔹 Redirection selon rôle
-        console.log('🔹 Rôle détecté:', user.role);
+     //   console.log('🔹 Rôle détecté:', user.role);
        switch (user.role) {
   case 'ADMIN':
     this.router.navigate(['/dashboard-admin']);
@@ -77,7 +77,7 @@ export class LoginComponent implements OnInit {
         this.isSubmitting = false;
       },
       error: (error) => {
-        console.error('❌ Erreur de connexion:', error);
+      //  console.error('❌ Erreur de connexion:', error);
         this.errorMessage = error.message || 'Échec de la connexion';
         this.isSubmitting = false;
       }

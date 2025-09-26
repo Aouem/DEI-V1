@@ -31,7 +31,7 @@ export class IncidentService {
   // 🔹 Récupérer un incident par ID
 getIncidentById(id: number): Observable<Incident> {
   return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
-    tap(data => console.log('Données brutes reçues :', data)), // <-- log ici
+   // tap(data => console.log('Données brutes reçues :', data)), // <-- log ici
     map(data => this.mapIncident(data)),
     catchError(this.handleError)
   );
@@ -106,15 +106,15 @@ updateIncident(id: number, incident: any): Observable<any> {
   createIncident(incident: EvenementCreateDto): Observable<Incident> {
     try {
       const payload = this.validateAndPreparePayload(incident);
-      console.log('Final payload being sent:', payload);
+    //  console.log('Final payload being sent:', payload);
 
       return this.http.post<Incident>(this.apiUrl, payload, {
         headers: this.getHeaders(),
         observe: 'response'
       }).pipe(
         tap({
-          next: (response) => console.log('Success response:', response),
-          error: (error) => console.error('Error in request:', error)
+    //      next: (response) => console.log('Success response:', response),
+      //    error: (error) => console.error('Error in request:', error)
         }),
         map(response => this.mapIncident(response.body)),
         catchError(this.handleError)
@@ -125,7 +125,7 @@ updateIncident(id: number, incident: any): Observable<any> {
   }
   // ✅ Mapper la réponse API vers un Incident harmonisé
   private mapIncident(data: any): Incident {
-  console.log('Données à mapper:', data);
+ // console.log('Données à mapper:', data);
   
   return {
     id: data.id,
@@ -393,7 +393,7 @@ dateCloture: data.dateCloture ? new Date(data.dateCloture) : undefined,
 
   // ✅ Gestion des erreurs
   private handleError(error: HttpErrorResponse): Observable<never> {
-    console.error('API Error:', error);
+ //   console.error('API Error:', error);
 
     let errorDetails = 'No additional details';
     if (error.error) {

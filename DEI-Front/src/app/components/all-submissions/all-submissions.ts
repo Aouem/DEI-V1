@@ -54,10 +54,10 @@ export class AllSubmissionsComponent implements OnInit {
         
         this.cdr.detectChanges();
         
-        console.log('Submissions avec incidentId corrigé:', this.submissions);
+      //  console.log('Submissions avec incidentId corrigé:', this.submissions);
       },
       error: (err: any) => {
-        console.error('Erreur API:', err);
+     //   console.error('Erreur API:', err);
         this.submissions = [];
         this.filteredSubmissions = [];
         this.pagedSubmissions = [];
@@ -125,7 +125,7 @@ getIncidentId(sub: SubmissionData): number | null {
 
   /** Applique le filtre par incidentId (grilleAlarmId) */
   applyFilters(): void {
-    console.log('Filtrage demandé avec incidentId:', this.incidentFilter);
+ //   console.log('Filtrage demandé avec incidentId:', this.incidentFilter);
     
     if (this.incidentFilter === null || this.incidentFilter === 0) {
       this.filteredSubmissions = [...this.submissions];
@@ -139,11 +139,12 @@ getIncidentId(sub: SubmissionData): number | null {
     this.currentPage = 1;
     this.updatePagedSubmissions();
     
-    console.log('Résultat du filtrage:', {
+  /*   console.log('Résultat du filtrage:', {
       incidentFilter: this.incidentFilter,
       total: this.submissions.length,
       filtered: this.filteredSubmissions.length
-    });
+    }
+  ); */
   }
 
   /** Met à jour les soumissions affichées sur la page courante */
@@ -208,12 +209,12 @@ deleteSubmission(sub: SubmissionData): void {
   if (confirm(`Voulez-vous vraiment supprimer la soumission #${sub.id} ?`)) {
     this.submissionService.deleteSubmission(sub.id).subscribe({
       next: () => {
-        console.log(`Soumission ${sub.id} supprimée ✅`);
+      //  console.log(`Soumission ${sub.id} supprimée ✅`);
         // Recharger toute la liste après suppression
         this.loadSubmissions();
       },
       error: (err) => {
-        console.error('Erreur lors de la suppression:', err);
+    //    console.error('Erreur lors de la suppression:', err);
         alert('❌ Échec de la suppression.');
       }
     });

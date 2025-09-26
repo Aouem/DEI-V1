@@ -156,33 +156,33 @@ export class ConfirmationComponent implements OnInit {
     this.submission = null;
     this.incidentId = null;
     this.hasData = false;
-    console.warn('Aucune donnée de soumission disponible');
+  //  console.warn('Aucune donnée de soumission disponible');
   }
 
 
   private fetchSubmission(submissionId: number): void {
-  console.log('🔍 Fetching submission avec ID:', submissionId);
+ // console.log('🔍 Fetching submission avec ID:', submissionId);
   
   this.submissionService.getSubmissionById(submissionId).subscribe({
     next: (submission) => {
-      console.log('📦 Submission reçu de l\'API:', submission);
+    //  console.log('📦 Submission reçu de l\'API:', submission);
       
       if (submission && submission.id) {
         this.processSubmissionData(submission);
       } else {
-        console.error('❌ Submission null ou sans ID');
+      //  console.error('❌ Submission null ou sans ID');
         this.handleNoData();
       }
     },
     error: (error) => {
-      console.error('❌ Erreur fetching submission:', error);
+   //   console.error('❌ Erreur fetching submission:', error);
       this.handleNoData();
     }
   });
 }
 
 private processSubmissionData(submission: SubmissionData): void {
-  console.log('Submission complet reçu:', submission);
+ // console.log('Submission complet reçu:', submission);
   
   this.submission = submission;
   this.submissionId = submission.id;
@@ -198,7 +198,7 @@ private processSubmissionData(submission: SubmissionData): void {
 
   private initializeData(submissionData: SubmissionData): void {
     try {
-      console.log('Initialisation avec données:', submissionData);
+    //  console.log('Initialisation avec données:', submissionData);
       
       this.submissionId = submissionData.id;
       this.submissionDate = new Date(submissionData.createdAt);
@@ -222,12 +222,12 @@ private processSubmissionData(submission: SubmissionData): void {
         };
       });
 
-      console.log('Données transformées:', {
+    /*   console.log('Données transformées:', {
         submissionId: this.submissionId,
         incidentId: this.incidentId,
         hasData: this.hasData,
         responsesCount: this.responses.length
-      });
+      }); */
 
       this.groupResponsesByCategory();
       this.categoryRiskScores = this.getCategoryRiskScores();
@@ -235,10 +235,10 @@ private processSubmissionData(submission: SubmissionData): void {
       
       // ⚠️ FORCER LE CHANGEMENT DETECTION
       this.cdRef.detectChanges();
-      console.log('✅ Changement detection forcé');
+    //  console.log('✅ Changement detection forcé');
       
     } catch (error) {
-      console.error('❌ Erreur dans initializeData:', error);
+    //  console.error('❌ Erreur dans initializeData:', error);
       this.hasData = false;
     }
   }
@@ -288,19 +288,19 @@ private getMainResponse(reponse: string): string {
 
   // Ajoutez cette méthode pour debugger l'état du composant
 private checkComponentState(): void {
-  console.log('🔍 État du composant:', {
+ /*  console.log('🔍 État du composant:', {
     hasData: this.hasData,
     submissionId: this.submissionId,
     incidentId: this.incidentId,
     submissionDate: this.submissionDate,
     responsesLength: this.responses.length,
     submission: this.submission
-  });
+  }); */
   
   // Test direct dans le template
   setTimeout(() => {
     const testElement = document.querySelector('.submission-info');
-    console.log('📋 Élément template:', testElement?.innerHTML);
+ //   console.log('📋 Élément template:', testElement?.innerHTML);
   }, 100);
 }
 

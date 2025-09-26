@@ -211,15 +211,15 @@ filteredCount: number = 0;
   };
 }
 private calculateCroissanceParAn() {
-  console.log('=== DEBUG calculateCroissanceParAn ===');
+//  console.log('=== DEBUG calculateCroissanceParAn ===');
   
   // Définir une plage fixe qui inclut 2025
   const startYear = 2021;
   const endYear = 2025;
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
   
-  console.log('🔍 Plage d\'années analysée:', years);
-  console.log('🔍 Nombre total d\'incidents:', this.incidents.length);
+ // console.log('🔍 Plage d\'années analysée:', years);
+ // console.log('🔍 Nombre total d\'incidents:', this.incidents.length);
 
   const graviteOrder = ['Bénin', 'Peu grave', 'Moyenne', 'Grave', 'Très grave', 'Catastrophique', 'N/A'];
   const dataByYear: { [year: number]: { [gravite: string]: number } } = {};
@@ -248,17 +248,17 @@ private calculateCroissanceParAn() {
             
             // Afficher les 5 premiers incidents pour debug
             if (totalComptes <= 5) {
-              console.log(`✓ Incident ${index}: année ${incidentYear}, gravité ${gravite}`);
+           //   console.log(`✓ Incident ${index}: année ${incidentYear}, gravité ${gravite}`);
             }
           }
         }
       } catch (error) {
-        console.error('Erreur avec l\'incident:', incident, error);
+     //   console.error('Erreur avec l\'incident:', incident, error);
       }
     }
   });
 
-  console.log(`📊 Incidents comptabilisés: ${totalComptes}`);
+ // console.log(`📊 Incidents comptabilisés: ${totalComptes}`);
 
   // Calculer les totaux et pourcentages de croissance
   this.croissanceParAn = years.map((year, index) => {
@@ -274,7 +274,7 @@ private calculateCroissanceParAn() {
       }
     }
 
-    console.log(`📅 Année ${year}: total=${total}, croissance=${croissance}%`, yearData);
+   // console.log(`📅 Année ${year}: total=${total}, croissance=${croissance}%`, yearData);
 
     return {
       annee: year,
@@ -284,16 +284,16 @@ private calculateCroissanceParAn() {
     };
   });
 
-  console.log('📈 Données finales:', this.croissanceParAn);
+//  console.log('📈 Données finales:', this.croissanceParAn);
   this.updateCroissanceChart();
 }
 
 
 private updateCroissanceChart() {
-  console.log('=== DEBUG updateCroissanceChart ===');
+//  console.log('=== DEBUG updateCroissanceChart ===');
   
   if (!this.croissanceParAn || this.croissanceParAn.length === 0) {
-    console.error('❌ Aucune donnée pour le graphique');
+ //   console.error('❌ Aucune donnée pour le graphique');
     return;
   }
 
@@ -309,7 +309,7 @@ const hasData = this.croissanceParAn.some(annee =>
 
 
   if (!hasData) {
-    console.warn('⚠️ Aucune donnée positive pour le graphique');
+  //  console.warn('⚠️ Aucune donnée positive pour le graphique');
     // Créer un graphique vide mais avec la structure correcte
     this.croissanceChartData = {
       labels: this.croissanceParAn.map(y => y.annee.toString()),
@@ -328,7 +328,7 @@ const hasData = this.croissanceParAn.some(annee =>
 
   const datasets = graviteOrder.map((gravite, index) => {
     const data = this.croissanceParAn.map(anneeData => anneeData.data[gravite] || 0);
-    console.log(`📊 Dataset ${gravite}:`, data);
+  //  console.log(`📊 Dataset ${gravite}:`, data);
     
     return {
       label: gravite,
@@ -345,7 +345,7 @@ const hasData = this.croissanceParAn.some(annee =>
     datasets: datasets
   };
 
-  console.log('✅ Graphique mis à jour:', this.croissanceChartData);
+ // console.log('✅ Graphique mis à jour:', this.croissanceChartData);
 }
 
 private calculateCroissanceAvecFiltres() {
@@ -454,18 +454,18 @@ getGravitePlusFrequente(): string {
     return `${maxGravite} (${maxCount} incident${maxCount > 1 ? 's' : ''})`;
     
   } catch (error) {
-    console.error('Erreur dans getGravitePlusFrequente:', error);
+  //  console.error('Erreur dans getGravitePlusFrequente:', error);
     return 'Erreur de calcul';
   }
 }
 // Méthode de debug temporaire
 debugCroissanceData() {
-  console.log('Données de croissance:', this.croissanceParAn);
-  console.log('Labels de gravité triés:', this.sortedGraviteLabels);
+ // console.log('Données de croissance:', this.croissanceParAn);
+ // console.log('Labels de gravité triés:', this.sortedGraviteLabels);
   
   if (this.croissanceParAn && this.croissanceParAn.length > 0) {
     this.croissanceParAn.forEach(annee => {
-      console.log(`Année ${annee.annee}:`, annee.data);
+  //    console.log(`Année ${annee.annee}:`, annee.data);
     });
   }
 }

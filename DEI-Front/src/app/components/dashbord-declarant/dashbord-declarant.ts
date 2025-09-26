@@ -69,8 +69,8 @@ export class DashbordDeclarantComponent implements OnInit {
 
       this.cdr.detectChanges(); // 🔹 Forcer la mise à jour de l'affichage
 
-      console.log("Incidents d'aujourd'hui :", todayIncidents);
-      console.log("Comptage par gravité :", this.severityCount);
+     // console.log("Incidents d'aujourd'hui :", todayIncidents);
+     // console.log("Comptage par gravité :", this.severityCount);
     });
   }
 

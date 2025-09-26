@@ -1,7 +1,37 @@
+<div class="filter-container mb-4 d-flex flex-wrap align-items-center gap-2">
+  <!-- Zone de recherche créative -->
+  <div class="input-group shadow-sm rounded-pill flex-grow-1" style="height: 40px;">
+    <span class="input-group-text bg-white pe-2">
+      <i class="bi bi-search"></i>
+    </span>
+    <input type="text" class="form-control border-0" placeholder="Rechercher par code..."
+           [(ngModel)]="filterCode" (input)="applyFilter()"
+           style="height: 38px; padding: 0 10px; font-size: 0.9rem;" />
+    <button *ngIf="filterCode" class="btn btn-outline-secondary p-0 d-flex align-items-center justify-content-center"
+            (click)="filterCode=''; applyFilter()" style="width: 30px; height: 30px; border-radius: 50%;">
+      <i class="bi bi-x-lg" style="font-size: 0.85rem;"></i>
+    </button>
+  </div>
+
+  <!-- Filtre par statut au même style et hauteur -->
+  <select class="form-select shadow-sm rounded-pill flex-grow-1" [(ngModel)]="filterStatut" (change)="applyFilter()"
+          style="height: 40px; font-size: 0.9rem; min-width: 180px;">
+    <option value="ALL">Tous les statuts</option>
+    <option value="BROUILLON">Brouillon</option>
+    <option value="SOUMIS">Soumis</option>
+    <option value="ENCOURSANALYSE">En cours analyse</option>
+    <option value="ACTIONREQUIS">Action requise</option>
+    <option value="RESOLU">Résolu</option>
+    <option value="CLOTURE">Clôturé</option>
+  </select>
+</div>
+
+
 <div class="table-responsive rounded-4 shadow-sm">
   <h3 class="mb-3 fw-bold text-primary text-center">
     Liste des incidents
   </h3>
+
   <table class="table table-hover align-middle mb-0">
     <thead>
       <tr class="incident-table-header">
@@ -14,7 +44,6 @@
     </thead>
     <tbody>
       <tr *ngFor="let incident of paginatedIncidents" class="incident-row">
-        <!-- Code avec ampoule clignotante -->
         <td class="ps-4 fw-bold font-monospace">
           {{ incident.code }}
           <span *ngIf="isNewIncident(incident.id)" class="new-incident">
@@ -24,27 +53,21 @@
 
         <td>{{ getDateFromCode(incident.code) }}</td>
 
-        <!-- Gravité -->
         <td>
-          <div class="gravity-indicator" [style.background]="getGraviteGradient(incident.gravite)">
+          <div class="gravity-indicator rounded-pill overflow-hidden" [style.background]="getGraviteGradient(incident.gravite)">
             <div class="gravity-level" [style.width.%]="getGraviteLevel(incident.gravite)"></div>
-            <span>{{ getGraviteLabel(incident.gravite) }}</span>
+            <span class="gravity-label">{{ getGraviteLabel(incident.gravite) }}</span>
           </div>
         </td>
 
-        <!-- Service -->
         <td>
           <span class="badge bg-primary">{{ getServiceName(incident) }}</span>
         </td>
 
-        <!-- Actions -->
         <td class="pe-4 d-flex gap-2">
-          <!-- Bouton Voir -->
           <button class="btn btn-action" (click)="openIncident(incident, 'view')" title="Voir">
             <i class="bi bi-eye"></i>
           </button>
-
-          <!-- Bouton Modifier -->
           <button class="btn btn-warning" (click)="openIncident(incident, 'edit')" title="Modifier">
             <i class="bi bi-pencil"></i>
           </button>

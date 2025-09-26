@@ -26,6 +26,9 @@ export class IncidentListComponent implements OnInit {
   pages: number[] = [];
   filterStatut: string = 'ALL';
 
+  filterCode: string = '';
+
+
   // Set des incidents nouveaux
   newIncidentIds = new Set<number>();
 
@@ -104,24 +107,28 @@ export class IncidentListComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erreur lors du chargement', err);
+     //   console.error('Erreur lors du chargement', err);
         this.loading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  applyFilter(): void {
-    if (this.filterStatut === 'ALL') {
-      this.filteredIncidents = [...this.incidents];
-    } else {
-      this.filteredIncidents = this.incidents.filter(
-        i => this.getStatutKey(i.statut).toUpperCase() === this.filterStatut
-      );
-    }
-    this.currentPage = 1;
-    this.setupPagination();
-  }
+applyFilter(): void {
+  this.filteredIncidents = this.incidents.filter(i => {
+    const statutMatch = this.filterStatut === 'ALL' 
+      || this.getStatutKey(i.statut).toUpperCase() === this.filterStatut;
+
+    const codeMatch = !this.filterCode 
+      || i.code?.toLowerCase().includes(this.filterCode.toLowerCase());
+
+    return statutMatch && codeMatch;
+  });
+
+  this.currentPage = 1;
+  this.setupPagination();
+}
+
 
   setupPagination(): void {
     this.totalPages = Math.ceil(this.filteredIncidents.length / this.itemsPerPage);

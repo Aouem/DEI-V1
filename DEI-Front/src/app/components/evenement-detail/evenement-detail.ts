@@ -405,24 +405,24 @@ chargerGrillesAlarme(): void {
         this.grillesAlarme = grilles;
       },
       error: (err) => {
-        console.error('Erreur chargement grilles:', err);
+      //  console.error('Erreur chargement grilles:', err);
       }
     });
 }
 
 
 voirGrille(grilleId: number) {
-    console.log('ID de la grille:', grilleId);
+   // console.log('ID de la grille:', grilleId);
     this.router.navigate([`/admin/confirmation/${grilleId}`]);
 }
 
 
   voirSubmission(submission: any) {
-    console.log('Voir submission:', submission);
+  //  console.log('Voir submission:', submission);
   }
 
   imprimerSubmission(submission: any) {
-    console.log('Imprimer submission:', submission);
+   // console.log('Imprimer submission:', submission);
   }
 
   onFileSelected(event: any) {
@@ -430,7 +430,7 @@ voirGrille(grilleId: number) {
     if (file && this.incident?.id) {
       const extension = file.name.substring(file.name.lastIndexOf('.'));
       this.selectedFile = new File([file], `${this.incident.id}${extension}`, { type: file.type });
-      console.log('Fichier sélectionné pour l\'incident :', this.selectedFile.name);
+     // console.log('Fichier sélectionné pour l\'incident :', this.selectedFile.name);
     }
   }
 
@@ -445,12 +445,12 @@ voirGrille(grilleId: number) {
 
     this.schemaService.uploadFile(renamedFile, this.incident.id).subscribe({
       next: res => {
-        console.log('Image uploadée avec succès !', res);
+  //      console.log('Image uploadée avec succès !', res);
         this.incident.schemaUrl = res.url;
         alert('Image ajoutée à l\'incident.');
       },
       error: err => {
-        console.error('Erreur upload image', err);
+   //     console.error('Erreur upload image', err);
         alert('Erreur lors de l\'upload.');
       }
     });

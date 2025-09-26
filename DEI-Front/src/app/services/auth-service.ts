@@ -183,7 +183,7 @@ updateUser(id: string, user: any): Observable<void> {
           : undefined
       };
     } catch (err) {
-      console.error('❌ Erreur décodage token:', err);
+   //   console.error('❌ Erreur décodage token:', err);
       return null;
     }
   }

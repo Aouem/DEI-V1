@@ -51,50 +51,39 @@ export class DashboardValidateurComponent implements OnInit {
 
   // 🔹 Calcul des incidents d'aujourd'hui et de leurs gravités (heure locale)
   loadTodayIncidents(): void {
-    this.incidentService.getIncidents().subscribe((incidents: Incident[]) => {
-      if (!incidents || incidents.length === 0) {
-        this.todayIncidentCount = 0;
-        this.severityCount = {};
-        return;
-      }
-
-      // Date du jour en local
-      const today = new Date();
-      const todayYear = today.getFullYear();
-      const todayMonth = today.getMonth();
-      const todayDay = today.getDate();
-
-      const todayIncidents = incidents.filter(i => {
-        if (!i.dateSurvenue) return false;
-
-        // Type-safe: convertir en Date uniquement si nécessaire
-        const incidentDate: Date = i.dateSurvenue instanceof Date
-          ? i.dateSurvenue
-          : new Date(i.dateSurvenue);
-
-        return (
-          incidentDate.getFullYear() === todayYear &&
-          incidentDate.getMonth() === todayMonth &&
-          incidentDate.getDate() === todayDay
-        );
-      });
-
-      this.todayIncidentCount = todayIncidents.length;
-        this.cdr.detectChanges();
-
-
-      // Comptage par gravité
+  this.incidentService.getIncidents().subscribe((incidents: Incident[]) => {
+    if (!incidents || incidents.length === 0) {
+      this.todayIncidentCount = 0;
       this.severityCount = {};
-      todayIncidents.forEach(i => {
-        const g = i.gravite ?? 0;
-        this.severityCount[g] = (this.severityCount[g] || 0) + 1;
-      });
+      this.cdr.detectChanges();  // <-- détecter les changements
+      return;
+    }
 
-      // 🔹 Logs pour vérification
-      console.log("Incidents d'aujourd'hui :", todayIncidents);
-      console.log('Comptage par gravité :', this.severityCount);
+    const today = new Date();
+    const todayIncidents = incidents.filter(i => {
+      if (!i.dateSurvenue) return false;
+      const incidentDate = i.dateSurvenue instanceof Date ? i.dateSurvenue : new Date(i.dateSurvenue);
+      return (
+        incidentDate.getFullYear() === today.getFullYear() &&
+        incidentDate.getMonth() === today.getMonth() &&
+        incidentDate.getDate() === today.getDate()
+      );
     });
-  }
+
+    this.todayIncidentCount = todayIncidents.length;
+
+    // Comptage par gravité
+    this.severityCount = {};
+    todayIncidents.forEach(i => {
+      const g = i.gravite ?? 0;
+      this.severityCount[g] = (this.severityCount[g] || 0) + 1;
+    });
+
+    // 🔹 Forcer la détection après toutes les mises à jour
+    this.cdr.detectChanges();
+  });
+}
+
 
   // 🔹 Retourne les clés de gravité pour *ngFor
   severityKeys(): number[] {

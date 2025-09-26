@@ -54,7 +54,7 @@ export class IncidentFormComponent implements OnInit {
     this.incidentForm.valueChanges.subscribe(() => this.updateStatut());
     this.incidentForm.statusChanges.subscribe(status => {
       if (status === 'INVALID') {
-        console.log('Champs invalides :', this.getFormValidationErrors().map(e => e.field));
+     //   console.log('Champs invalides :', this.getFormValidationErrors().map(e => e.field));
 
 
 
@@ -132,7 +132,7 @@ this.actionsCorrectives.valueChanges.subscribe(() => {
             this.incidentForm.patchValue(formData);
           },
           error: (error) => {
-            console.error('Erreur lors du chargement de l\'incident:', error);
+        //    console.error('Erreur lors du chargement de l\'incident:', error);
           }
         });
       }
@@ -486,7 +486,7 @@ this.actionsCorrectives.valueChanges.subscribe(() => {
 
     try {
       const payload = this.prepareFormData();
-      console.log('Payload complet:', JSON.stringify(payload, null, 2));
+   //   console.log('Payload complet:', JSON.stringify(payload, null, 2));
       
       const result = await this.incidentService.createIncident(payload).toPromise();
       this.successMessage = 'Incident enregistré avec succès!';
@@ -495,9 +495,9 @@ this.actionsCorrectives.valueChanges.subscribe(() => {
   }
     setTimeout(() => this.location.back(), 2000);
     } catch (error: any) {
-      console.error('Erreur détaillée:', error);
+   //   console.error('Erreur détaillée:', error);
       if (error.error) {
-        console.error('Réponse du serveur:', error.error);
+    //    console.error('Réponse du serveur:', error.error);
       }
       this.errorMessage = error.message || 'Erreur lors de l\'enregistrement';
     } finally {
@@ -732,11 +732,11 @@ this.actionsCorrectives.valueChanges.subscribe(() => {
 
   showValidationErrors(): void {
     const errors = this.getFormValidationErrors();
-    console.log('Erreurs de validation:', errors);
+  //  console.log('Erreurs de validation:', errors);
     
     const mesuresError = this.incidentForm.get('mesuresImmediates')?.errors;
     if (mesuresError) {
-      console.log('Erreur mesuresImmediates:', mesuresError);
+   //   console.log('Erreur mesuresImmediates:', mesuresError);
     }
   }
 

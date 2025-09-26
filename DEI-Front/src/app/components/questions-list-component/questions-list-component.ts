@@ -136,7 +136,7 @@ export class QuestionsListComponent implements OnInit {
       this.router.navigate(['/admin/confirmation'], { queryParams: { incidentId: this.incidentId } });
     },
     error: (err) => {
-      console.error('Erreur SubmissionService:', err);
+   //   console.error('Erreur SubmissionService:', err);
       this.errorMessage = 'Erreur lors de l’enregistrement de la submission';
       this.isSubmitting = false;
     }
