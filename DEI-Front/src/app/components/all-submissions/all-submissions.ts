@@ -23,6 +23,17 @@ export class AllSubmissionsComponent implements OnInit {
   pageSize = 10;
   currentPage = 1;
 
+
+    showPasswordModal = false;
+  password = '';
+  submissionToDelete: SubmissionData | null = null;
+  isDeleting = false;
+  deleteError = '';
+
+  private readonly DELETE_PASSWORD = 'admin123';
+
+
+
   constructor(
     private submissionService: SubmissionService,
     private router: Router,
@@ -201,25 +212,32 @@ getIncidentId(sub: SubmissionData): number | null {
     this.loadSubmissions();
   }
 
-  /** Supprimer une soumission */
-/** Supprimer une soumission */
+ /** Supprimer une soumission avec mot de passe simple */
 deleteSubmission(sub: SubmissionData): void {
   if (!sub.id) return;
+
+  // Demander le mot de passe
+  const password = prompt('Entrez le mot de passe pour supprimer cette soumission :');
+  if (password !== this.DELETE_PASSWORD) {
+    alert('❌ Mot de passe incorrect. Suppression annulée.');
+    return;
+  }
 
   if (confirm(`Voulez-vous vraiment supprimer la soumission #${sub.id} ?`)) {
     this.submissionService.deleteSubmission(sub.id).subscribe({
       next: () => {
-      //  console.log(`Soumission ${sub.id} supprimée ✅`);
-        // Recharger toute la liste après suppression
+        alert(`✅ Soumission #${sub.id} supprimée avec succès.`);
+        // Recharger la liste après suppression
         this.loadSubmissions();
       },
       error: (err) => {
-    //    console.error('Erreur lors de la suppression:', err);
+        console.error('Erreur lors de la suppression:', err);
         alert('❌ Échec de la suppression.');
       }
     });
   }
 }
+
 
 
 }

@@ -29,6 +29,10 @@ export class ArbredecauseComponent implements OnInit {
   arbreToDelete: Arbre | null = null;
   incidentFilter: number | null = null;
 
+private readonly DELETE_PASSWORD = 'admin123';
+
+  
+
   constructor(
     private schemaService: SchemaService,
     private cdr: ChangeDetectorRef
@@ -98,17 +102,24 @@ applyFilters(): void {
     this.selectedImageUrl = arbre.schemaUrl + `?t=${new Date().getTime()}`; 
   }
 
-  confirmDelete(arbre: Arbre): void {
-    this.arbreToDelete = arbre;
-    
-    const isConfirmed = confirm(`Êtes-vous sûr de vouloir supprimer l'arbre des causes de l'incident ${arbre.incidentId} du ${new Date(arbre.dateSurvenue).toLocaleDateString()} ?`);
-    
-    if (isConfirmed) {
-      this.deleteArbre(arbre);
-    } else {
-      this.arbreToDelete = null;
-    }
+/** Supprimer un arbre des causes avec mot de passe simple */
+confirmDelete(arbre: Arbre): void {
+  // Demander le mot de passe
+  const password = prompt('Entrez le mot de passe pour supprimer cet arbre des causes :');
+  if (password !== this.DELETE_PASSWORD) {
+    alert('❌ Mot de passe incorrect. Suppression annulée.');
+    return;
   }
+
+  // Demande confirmation avant suppression
+  const isConfirmed = confirm(
+    `Êtes-vous sûr de vouloir supprimer l'arbre des causes de l'incident ${arbre.incidentId} du ${new Date(arbre.dateSurvenue).toLocaleDateString()} ?`
+  );
+
+  if (isConfirmed) {
+    this.deleteArbre(arbre);
+  }
+}
 
   deleteArbre(arbre: Arbre): void {
     this.schemaService.deleteFile(arbre.incidentId).subscribe({
